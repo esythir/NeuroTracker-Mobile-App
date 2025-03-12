@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace 'com.example.neurotrack'
+    namespace "com.example.neurotrack"
     compileSdk 34
 
     defaultConfig {
