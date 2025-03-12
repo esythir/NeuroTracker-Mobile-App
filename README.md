@@ -10,6 +10,15 @@ NeuroTracker é um aplicativo Android para acompanhamento de comportamentos e ro
 - Kotlin 1.9.0 ou superior
 - Dispositivo Android ou Emulador
 
+### Dependências Principais
+- Jetpack Compose: 1.5.4
+- Compose Material 3: 1.1.2
+- Room: 2.6.1
+- Koin: 3.5.0
+- Navigation Compose: 2.7.5
+- Kotlin Coroutines: 1.7.3
+- Kotlin Flow: 1.7.3
+
 ## Configuração do Projeto
 
 1. Clone o repositório:
