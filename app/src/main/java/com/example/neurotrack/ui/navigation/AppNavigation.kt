@@ -1,13 +1,19 @@
 package com.example.neurotrack.ui.navigation
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.neurotrack.navigation.NavRoutes
 import com.example.neurotrack.ui.components.BottomBar
-import com.example.neurotrack.ui.screens.*
+import com.example.neurotrack.ui.screens.AddScreen
+import com.example.neurotrack.ui.screens.DashboardScreen
+import com.example.neurotrack.ui.screens.HistoryScreen
+import com.example.neurotrack.ui.screens.HomeScreen
+import com.example.neurotrack.ui.screens.calendar.CalendarScreen
 
 @Composable
 fun AppNavigation() {
@@ -18,10 +24,14 @@ fun AppNavigation() {
     ) { paddingValues ->
         NavHost(
             navController = navController,
-            startDestination = NavRoutes.Home.route
+            startDestination = NavRoutes.Home.route,
+            modifier = Modifier.padding(paddingValues)
         ) {
             composable(NavRoutes.Home.route) {
-                HomeScreen()
+                HomeScreen(
+                    onSettingsClick = { /* TODO */ },
+                    onDashboardClick = { navController.navigate(NavRoutes.Dashboard.route) }
+                )
             }
             composable(NavRoutes.History.route) {
                 HistoryScreen()
