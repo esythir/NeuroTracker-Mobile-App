@@ -1,18 +1,43 @@
 package com.example.neurotrack.ui.screens
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.example.neurotrack.ui.components.HomeTopBar
+import com.example.neurotrack.ui.components.HomeStatsGrid
 
 @Composable
-fun HomeScreen() {
-    Box(
+fun HomeScreen(
+    onSettingsClick: () -> Unit = {},
+    onDashboardClick: () -> Unit = {}
+) {
+    Surface(
         modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        color = MaterialTheme.colorScheme.background
     ) {
-        Text(text = "Home Screen")
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 80.dp) // Espaço para a BottomBar
+        ) {
+            HomeTopBar(
+                patientName = "João Silva",
+                onSettingsClick = onSettingsClick
+            )
+            
+            HomeStatsGrid(
+                recordCount = 42,
+                onDashboardClick = onDashboardClick
+            )
+            
+            // Espaço para debug
+            Text(
+                text = "Home Screen",
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.padding(16.dp)
+            )
+        }
     }
 } 
