@@ -3,6 +3,7 @@ package com.example.neurotrack
 import android.app.Application
 import com.example.neurotrack.di.appModule
 import com.example.neurotrack.di.databaseModule
+import com.example.neurotrack.di.viewModelModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -14,7 +15,7 @@ class NeuroTrackerApp : Application() {
         startKoin {
             androidLogger()
             androidContext(this@NeuroTrackerApp)
-            modules(listOf(appModule, databaseModule))
+            modules(listOf(appModule, databaseModule, viewModelModule))
         }
     }
 } 
