@@ -58,7 +58,6 @@ fun AddScreen(
     val isFromCalendarState by viewModel.isFromCalendarFlow.collectAsState()
     var showTimePicker by remember { mutableStateOf(false) }
     
-    // Inicializar com data/hora atual ou data selecionada
     var selectedDateTime by remember { 
         val now = LocalDateTime.now()
         val date = selectedDate ?: LocalDate.now()
@@ -146,9 +145,9 @@ fun AddScreen(
                     )
                 }
 
-                Text("Como você está se sentindo hoje?", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                Text("Como o paciente está se sentindo hoje?", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 Text(
-                    "Toque em um emoji para selecionar seu humor.",
+                    "Toque em um emoji para selecionar o humor do paciente.",
                     fontSize = 13.sp,
                     color = Color(0xFF666666),
                     modifier = Modifier.padding(bottom = 15.dp, top = 0.dp)
@@ -167,7 +166,7 @@ fun AddScreen(
 
                 Text("Sentimentos Envolvidos", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 Text(
-                    "Selecione os sentimentos relacionados ao seu humor.",
+                    "Selecione os sentimentos relacionados ao humor do paciente.",
                     fontSize = 13.sp,
                     color = Color(0xFF666666),
                     modifier = Modifier.padding(bottom = 15.dp)
@@ -178,8 +177,8 @@ fun AddScreen(
                 )
                 Spacer(modifier = Modifier.height(40.dp))
 
-                Text("Nome do Comportamento", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-                Text("Selecione o comportamento predominante.", fontSize = 13.sp, color = Color(0xFF666666))
+                Text("Selecione o comportamento do paciente", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                Text("Escolha uma das opções abaixo.", fontSize = 13.sp, color = Color(0xFF666666))
                 SingleSelectDropdown(
                     modifier = Modifier.padding(top = 8.dp),
                     options = behaviorOptions,
@@ -189,8 +188,8 @@ fun AddScreen(
                 )
                 Spacer(modifier = Modifier.height(40.dp))
 
-                Text("Duração do Comportamento", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-                Text("Selecione a duração em minutos.", fontSize = 13.sp, color = Color(0xFF666666))
+                Text("Duração do comportamento do paciente", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                Text("Por quanto tempo o comportamento persistiu?", fontSize = 13.sp, color = Color(0xFF666666))
                 SingleSelectDropdown(
                     modifier = Modifier.padding(top = 8.dp),
                     options = durationOptions,
@@ -200,8 +199,8 @@ fun AddScreen(
                 )
                 Spacer(modifier = Modifier.height(40.dp))
 
-                Text("Intensidade do Comportamento", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-                Text("Selecione a intensidade de 1 a 5.", fontSize = 13.sp, color = Color(0xFF666666))
+                Text("Selecione a intensidade do comportamento do paciente", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                Text("Arraste o slider para ajustar.", fontSize = 13.sp, color = Color(0xFF666666))
                 Spacer(modifier = Modifier.height(10.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -232,8 +231,8 @@ fun AddScreen(
                 }
                 Spacer(modifier = Modifier.height(40.dp))
 
-                Text("Gatilho do Comportamento", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-                Text("Selecione o gatilho.", fontSize = 13.sp, color = Color(0xFF666666))
+                Text("O que desencadeou o comportamento?", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                Text("Selecione o que pode ter causado esse comportamento.", fontSize = 13.sp, color = Color(0xFF666666))
                 SingleSelectDropdown(
                     modifier = Modifier.padding(top = 8.dp),
                     options = triggerOptions,
@@ -261,8 +260,8 @@ fun AddScreen(
                 }
                 Spacer(modifier = Modifier.height(40.dp))
 
-                Text("Observações", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-                Text("Adicione observações sobre o comportamento.", fontSize = 13.sp, color = Color(0xFF666666))
+                Text("Observações adicionais", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                Text("Adicione notas sobre o comportamento do paciente.", fontSize = 13.sp, color = Color(0xFF666666))
                 Spacer(modifier = Modifier.height(10.dp))
                 OutlinedTextField(
                     value = observations,

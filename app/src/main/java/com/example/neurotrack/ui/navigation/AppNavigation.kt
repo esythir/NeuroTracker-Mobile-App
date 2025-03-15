@@ -12,7 +12,7 @@ import androidx.navigation.NavType
 import com.example.neurotrack.navigation.NavRoutes
 import com.example.neurotrack.ui.components.BottomBar
 import com.example.neurotrack.ui.screens.addscreen.AddScreen
-import com.example.neurotrack.ui.screens.DashboardScreen
+import com.example.neurotrack.ui.screens.dashboard.DashboardScreen
 import com.example.neurotrack.ui.screens.history.HistoryScreen
 import com.example.neurotrack.ui.screens.home.HomeScreen
 import com.example.neurotrack.ui.screens.calendar.CalendarScreen
@@ -20,13 +20,10 @@ import androidx.navigation.NavHostController
 import java.time.LocalDate
 
 @Composable
-fun AppNavigation(
-    navController: NavHostController,
-    startDestination: String = Screen.Home.route
-) {
+fun AppNavigation(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = Screen.Home.route
     ) {
         composable(Screen.Home.route) {
             HomeScreen()

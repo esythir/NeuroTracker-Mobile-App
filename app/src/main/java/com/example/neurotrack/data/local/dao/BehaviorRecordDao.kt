@@ -30,4 +30,7 @@ interface BehaviorRecordDao {
         ORDER BY timestamp DESC
     """)
     fun getBehaviorRecordsBetweenDates(startTime: Long, endTime: Long): Flow<List<BehaviorRecord>>
+
+    @Query("SELECT * FROM behavior_records WHERE timestamp >= :timestamp ORDER BY timestamp DESC")
+    suspend fun getBehaviorRecordsAfterDate(timestamp: Long): List<BehaviorRecord>
 } 
