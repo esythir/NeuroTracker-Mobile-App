@@ -9,7 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.neurotrack.navigation.NavRoutes
 import com.example.neurotrack.ui.components.BottomBar
-import com.example.neurotrack.ui.screens.AddScreen
+import com.example.neurotrack.ui.screens.addscreen.AddScreen
 import com.example.neurotrack.ui.screens.DashboardScreen
 import com.example.neurotrack.ui.screens.history.HistoryScreen
 import com.example.neurotrack.ui.screens.home.HomeScreen
