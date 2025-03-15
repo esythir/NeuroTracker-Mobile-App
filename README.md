@@ -2,18 +2,6 @@
 
 NeuroTracker é um aplicativo Android para acompanhamento de comportamentos e rotinas, especialmente útil para pessoas com condições neurodivergentes.
 
-## Git Workflow
-
-O projeto segue um fluxo de trabalho baseado em branches:
-
-### Branches Principais
-- `main`: Código em produção
-- `dev`: Branch de desenvolvimento, onde as features são integradas
-- `feature/*`: Branches para desenvolvimento de novas funcionalidades
-
-### Fluxo de Trabalho
-1. Crie uma nova branch a partir de `dev`:
-
 ## Requisitos
 
 - Android Studio Hedgehog | 2023.1.1
@@ -21,15 +9,6 @@ O projeto segue um fluxo de trabalho baseado em branches:
 - Android SDK (mínimo API 24 - Android 7.0)
 - Kotlin 1.9.0 ou superior
 - Dispositivo Android ou Emulador
-
-### Dependências Principais
-- Jetpack Compose: 1.5.4
-- Compose Material 3: 1.1.2
-- Room: 2.6.1
-- Koin: 3.5.0
-- Navigation Compose: 2.7.5
-- Kotlin Coroutines: 1.7.3
-- Kotlin Flow: 1.7.3
 
 ## Configuração do Projeto
 

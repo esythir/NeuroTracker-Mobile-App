@@ -23,5 +23,10 @@ data class BehaviorRecord(
     val id: Int = 0,
     val behaviorId: Int,
     val timestamp: Long,
-    val notes: String? = null
+    val mood: String?,               // Humor geral (Péssimo, Mal, Okay, Bem, Ótimo)
+    val feelings: String?,           // Lista de sentimentos como String
+    val intensity: Int,              // 1-5
+    val duration: String,            // "15 min", "30 min", etc
+    val trigger: String?,            // Gatilho do comportamento
+    val notes: String? = null        // Observações adicionais
 ) 

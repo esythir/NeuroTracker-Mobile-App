@@ -1,22 +1,16 @@
 package com.example.neurotrack.di
 
-import com.example.neurotrack.data.repository.BehaviorRecordRepository
+import com.example.neurotrack.BuildConfig
+import com.example.neurotrack.data.service.GeminiService
 import com.example.neurotrack.data.repository.BehaviorRepository
-import com.example.neurotrack.data.repository.ScheduleRepository
-import com.example.neurotrack.ui.viewmodels.BehaviorViewModel
-import com.example.neurotrack.ui.viewmodels.ScheduleViewModel
-import com.example.neurotrack.ui.viewmodels.BehaviorRecordViewModel
-import org.koin.androidx.viewmodel.dsl.viewModel
+import com.example.neurotrack.data.repository.BehaviorRecordRepository
 import org.koin.dsl.module
 
 val appModule = module {
-    // Repositories
-    single { BehaviorRecordRepository(get()) }
-    single { BehaviorRepository(get()) }
-    single { ScheduleRepository(get()) }
+    // Services
+    single { GeminiService(BuildConfig.GEMINI_API_KEY) }
 
-    // ViewModels
-    viewModel { BehaviorViewModel(get()) }
-    viewModel { ScheduleViewModel(get()) }
-    viewModel { BehaviorRecordViewModel(get()) }
+    // Repositories
+    single { BehaviorRepository(get()) }
+    single { BehaviorRecordRepository(get()) }
 } 
