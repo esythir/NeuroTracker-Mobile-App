@@ -35,12 +35,36 @@ import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import java.time.LocalDate
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
+import org.koin.core.parameter.parametersOf
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import androidx.compose.ui.window.DialogProperties
 
 @Composable
 fun AddScreen(
-    viewModel: AddViewModel = koinViewModel()
+    initialDate: LocalDate? = null,
+    isFromCalendar: Boolean = false,
+    onNavigateBack: () -> Unit = {},
+    onNavigateToHome: () -> Unit = {},
+    onNavigateToCalendar: () -> Unit = {},
+    modifier: Modifier = Modifier,
+    viewModel: AddViewModel = koinViewModel { parametersOf(initialDate, isFromCalendar) }
 ) {
-    var showSuccessDialog by remember { mutableStateOf(false) }
+    val selectedDate by viewModel.selectedDate.collectAsState()
+    val showSuccessDialog by viewModel.showSuccessDialog.collectAsState()
+    val isFromCalendarState by viewModel.isFromCalendarFlow.collectAsState()
+    var showTimePicker by remember { mutableStateOf(false) }
+    
+    // Inicializar com data/hora atual ou data selecionada
+    var selectedDateTime by remember { 
+        val now = LocalDateTime.now()
+        val date = selectedDate ?: LocalDate.now()
+        mutableStateOf(LocalDateTime.of(date, now.toLocalTime()))
+    }
+
     var selectedMood by remember { mutableStateOf<String?>(null) }
     val selectedFeelings = remember { mutableStateListOf<UiFeeling>() }
     var selectedIntensity by remember { mutableStateOf<Int?>(null) }
@@ -52,7 +76,7 @@ fun AddScreen(
     var selectedTrigger by remember { mutableStateOf("") }
 
     val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.getDefault())
-    var dateTime by remember { mutableStateOf(dateFormat.format(Date())) }
+    var dateTimeValue by remember { mutableStateOf(dateFormat.format(Date())) }
 
     var observations by remember { mutableStateOf("") }
 
@@ -104,7 +128,7 @@ fun AddScreen(
                         text = "←",
                         fontSize = 24.sp,
                         modifier = Modifier
-                            .clickable { /* navigate back */ }
+                            .clickable { onNavigateBack() }
                             .padding(end = 10.dp),
                         color = Color(0xFF333333)
                     )
@@ -221,13 +245,20 @@ fun AddScreen(
 
                 Text("Data e Hora do Ocorrido", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 Text("Selecione a data e hora.", fontSize = 13.sp, color = Color(0xFF666666))
-                Spacer(modifier = Modifier.height(10.dp))
-                OutlinedTextField(
-                    value = dateTime,
-                    onValueChange = { dateTime = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    textStyle = LocalTextStyle.current.copy(fontSize = 14.sp),
-                )
+                
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(1.dp, Color(0xFFCCCCCC), RoundedCornerShape(5.dp))
+                        .clickable { showTimePicker = true }
+                        .padding(16.dp)
+                ) {
+                    Text(
+                        text = selectedDateTime.format(
+                            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+                        )
+                    )
+                }
                 Spacer(modifier = Modifier.height(40.dp))
 
                 Text("Observações", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
@@ -244,6 +275,58 @@ fun AddScreen(
                 )
                 Spacer(modifier = Modifier.height(25.dp))
 
+                // Dialog de sucesso padronizado
+                if (showSuccessDialog) {
+                    AlertDialog(
+                        onDismissRequest = { 
+                            viewModel.hideSuccessDialog()
+                            if (isFromCalendarState) {
+                                onNavigateToCalendar()
+                            } else {
+                                onNavigateToHome()
+                            }
+                        },
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        title = {
+                            Text(
+                                text = "Registro salvo!",
+                                style = MaterialTheme.typography.headlineSmall,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        },
+                        text = {
+                            Text(
+                                text = "Seu registro foi salvo com sucesso.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        },
+                        confirmButton = {
+                            TextButton(
+                                onClick = {
+                                    viewModel.hideSuccessDialog()
+                                    if (isFromCalendarState) {
+                                        onNavigateToCalendar()
+                                    } else {
+                                        onNavigateToHome()
+                                    }
+                                }
+                            ) {
+                                Text(
+                                    text = "OK",
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        },
+                        properties = DialogProperties(
+                            dismissOnBackPress = true,
+                            dismissOnClickOutside = true
+                        )
+                    )
+                }
+
+                // Botão de registrar
                 Button(
                     onClick = {
                         viewModel.saveBehaviorRecord(
@@ -253,9 +336,9 @@ fun AddScreen(
                             intensity = selectedIntensity ?: 1,
                             duration = selectedDuration,
                             trigger = selectedTrigger,
-                            notes = observations
+                            notes = observations,
+                            dateTime = selectedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"))
                         )
-                        showSuccessDialog = true
                     },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(10.dp),
@@ -266,48 +349,61 @@ fun AddScreen(
 
                 Spacer(modifier = Modifier.height(15.dp))
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    Text(
-                        text = "Cancelar",
-                        fontSize = 14.sp,
-                        color = Color(0xFF666666),
-                        modifier = Modifier.clickable {
-                            // Handle cancel
+                    TextButton(onClick = {
+                        if (isFromCalendarState) {
+                            onNavigateToCalendar()
+                        } else {
+                            onNavigateToHome()
                         }
-                    )
+                    }) {
+                        Text("Cancelar")
+                    }
                 }
             }
         }
     }
 
-    if (showSuccessDialog) {
+    if (showTimePicker) {
         AlertDialog(
-            onDismissRequest = { showSuccessDialog = false },
-            icon = {
-                Icon(
-                    Icons.Filled.CheckCircle,
-                    contentDescription = "Sucesso",
-                    tint = Color.Green,
-                    modifier = Modifier.size(48.dp)
-                )
-            },
-            title = {
-                Text("Sucesso!")
-            },
+            onDismissRequest = { showTimePicker = false },
+            properties = DialogProperties(dismissOnClickOutside = true),
+            title = { Text("Selecione a hora") },
             text = {
-                Text("Seu registro foi salvo com sucesso.")
+                Column {
+                    // Se veio do calendário, mostra apenas seleção de hora
+                    if (!isFromCalendarState) {
+                        // TODO: Adicionar DatePicker
+                    }
+                    
+                    // TimePicker customizado
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        // Horas
+                        NumberPicker(
+                            value = selectedDateTime.hour,
+                            range = 0..23,
+                            onValueChange = { hour ->
+                                selectedDateTime = selectedDateTime.withHour(hour)
+                            }
+                        )
+                        
+                        Text(":")
+                        
+                        // Minutos
+                        NumberPicker(
+                            value = selectedDateTime.minute,
+                            range = 0..59,
+                            onValueChange = { minute ->
+                                selectedDateTime = selectedDateTime.withMinute(minute)
+                            }
+                        )
+                    }
+                }
             },
             confirmButton = {
-                TextButton(
-                    onClick = {
-                        showSuccessDialog = false
-                        selectedMood = null
-                        selectedFeelings.clear()
-                        selectedIntensity = null
-                        selectedDuration = ""
-                        selectedTrigger = ""
-                        observations = ""
-                    }
-                ) {
+                TextButton(onClick = { showTimePicker = false }) {
                     Text("OK")
                 }
             }
@@ -503,6 +599,38 @@ fun SingleSelectDropdown(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun NumberPicker(
+    value: Int,
+    range: IntRange,
+    onValueChange: (Int) -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        IconButton(
+            onClick = { 
+                if (value < range.last) onValueChange(value + 1)
+            }
+        ) {
+            Text("▲")
+        }
+        
+        Text(
+            text = String.format("%02d", value),
+            modifier = Modifier.padding(vertical = 8.dp)
+        )
+        
+        IconButton(
+            onClick = { 
+                if (value > range.first) onValueChange(value - 1)
+            }
+        ) {
+            Text("▼")
         }
     }
 }

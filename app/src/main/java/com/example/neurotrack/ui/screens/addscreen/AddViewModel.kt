@@ -9,10 +9,32 @@ import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import java.time.LocalDate
+import kotlinx.coroutines.flow.asStateFlow
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 class AddViewModel(
-    private val behaviorRecordDao: BehaviorRecordDao
+    private val behaviorRecordDao: BehaviorRecordDao,
+    initialDate: LocalDate? = null,
+    private val isFromCalendar: Boolean = false
 ) : ViewModel() {
+    private val _selectedDate = MutableStateFlow(initialDate)
+    val selectedDate: StateFlow<LocalDate?> = _selectedDate.asStateFlow()
+    
+    private val _showSuccessDialog = MutableStateFlow(false)
+    val showSuccessDialog: StateFlow<Boolean> = _showSuccessDialog.asStateFlow()
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    val isFromCalendarFlow = MutableStateFlow(isFromCalendar)
+
+    fun setInitialDate(date: LocalDate) {
+        _selectedDate.value = date
+    }
 
     fun saveBehaviorRecord(
         behaviorId: Int,
@@ -21,13 +43,19 @@ class AddViewModel(
         intensity: Int,
         duration: String,
         trigger: String?,
-        notes: String?
+        notes: String?,
+        dateTime: String
     ) {
         viewModelScope.launch {
             try {
+                _isLoading.value = true
+                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm")
+                val localDateTime = LocalDateTime.parse(dateTime, formatter)
+                val timestamp = localDateTime.atZone(ZoneId.systemDefault()).toEpochSecond()
+
                 val record = BehaviorRecord(
                     behaviorId = behaviorId,
-                    timestamp = System.currentTimeMillis() / 1000, // Convertendo para segundos
+                    timestamp = timestamp,
                     mood = mood,
                     feelings = feelings.joinToString(","),
                     intensity = intensity,
@@ -37,10 +65,16 @@ class AddViewModel(
                 )
                 
                 behaviorRecordDao.insertBehaviorRecord(record)
+                _showSuccessDialog.value = true
             } catch (e: Exception) {
-                // Log do erro
                 e.printStackTrace()
+            } finally {
+                _isLoading.value = false
             }
         }
+    }
+
+    fun hideSuccessDialog() {
+        _showSuccessDialog.value = false
     }
 } 

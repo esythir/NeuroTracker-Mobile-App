@@ -23,21 +23,30 @@ fun CalendarContent(
     onDayClick: (LocalDate) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val daysInWeek = listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
+    val daysInWeek = listOf("D", "S", "T", "Q", "Q", "S", "S")
+    val purple = Color(0xFF6750A4) // Cor roxa do design
+    val gray = Color.Gray.copy(alpha = 0.3f) // Cinza claro padrão
     
     Column(modifier = modifier) {
-        // Dias da semana
+        // Dias da semana sem background
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             daysInWeek.forEach { day ->
-                Text(
-                    text = day,
-                    modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .aspectRatio(1f)
+                        .padding(2.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = day,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = LocalContentColor.current
+                    )
+                }
             }
         }
 
@@ -72,10 +81,9 @@ fun CalendarContent(
                             )
                             .background(
                                 when {
-                                    date == selectedDate -> MaterialTheme.colorScheme.primary
-                                    date in markedDates -> MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
-                                    date == today -> MaterialTheme.colorScheme.primaryContainer
-                                    else -> Color.Transparent
+                                    date in markedDates && date?.month == currentMonth.month -> purple
+                                    date?.month != currentMonth.month -> gray // Dias de outros meses em cinza
+                                    else -> Color.Transparent // Dias do mês atual transparentes
                                 },
                                 shape = CircleShape
                             ),
@@ -85,9 +93,8 @@ fun CalendarContent(
                             Text(
                                 text = date.dayOfMonth.toString(),
                                 color = when {
-                                    date == selectedDate -> MaterialTheme.colorScheme.onPrimary
-                                    date in markedDates -> MaterialTheme.colorScheme.onPrimary
-                                    date == today -> MaterialTheme.colorScheme.onPrimaryContainer
+                                    date in markedDates && date.month == currentMonth.month -> Color.White
+                                    date.month != currentMonth.month -> Color.White
                                     else -> LocalContentColor.current
                                 },
                                 style = MaterialTheme.typography.bodyMedium
