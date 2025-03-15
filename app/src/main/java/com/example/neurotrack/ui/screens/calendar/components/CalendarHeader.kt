@@ -8,11 +8,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
-import java.util.*
 
 @Composable
 fun CalendarHeader(
@@ -22,31 +20,23 @@ fun CalendarHeader(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = onPreviousMonth) {
-            Icon(
-                imageVector = Icons.Default.KeyboardArrowLeft,
-                contentDescription = "Previous month"
-            )
+            Icon(Icons.Default.KeyboardArrowLeft, "Previous month")
         }
 
         Text(
-            text = currentMonth.format(
-                DateTimeFormatter.ofPattern("MMMM yyyy", Locale.getDefault())
-            ),
-            style = MaterialTheme.typography.titleLarge,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.weight(1f)
+            text = currentMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy")),
+            style = MaterialTheme.typography.titleLarge
         )
 
         IconButton(onClick = onNextMonth) {
-            Icon(
-                imageVector = Icons.Default.KeyboardArrowRight,
-                contentDescription = "Next month"
-            )
+            Icon(Icons.Default.KeyboardArrowRight, "Next month")
         }
     }
 } 

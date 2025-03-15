@@ -3,89 +3,99 @@ package com.example.neurotrack.ui.screens.calendar.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.kizitonwose.calendar.compose.HorizontalCalendar
-import com.kizitonwose.calendar.compose.rememberCalendarState
-import com.kizitonwose.calendar.core.CalendarDay
-import com.kizitonwose.calendar.core.DayPosition
-import com.kizitonwose.calendar.core.daysOfWeek
-import java.time.DayOfWeek
+import java.time.LocalDate
 import java.time.YearMonth
-import java.time.format.TextStyle
-import java.util.*
 
 @Composable
 fun CalendarContent(
     currentMonth: YearMonth,
-    onDayClick: (CalendarDay) -> Unit,
+    selectedDate: LocalDate?,
+    today: LocalDate,
+    markedDates: Set<LocalDate>,
+    onDayClick: (LocalDate) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val startMonth = currentMonth.minusMonths(100)
-    val endMonth = currentMonth.plusMonths(100)
-    val state = rememberCalendarState(
-        startMonth = startMonth,
-        endMonth = endMonth,
-        firstVisibleMonth = currentMonth,
-        firstDayOfWeek = DayOfWeek.SUNDAY
-    )
-
+    val daysInWeek = listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
+    
     Column(modifier = modifier) {
         // Dias da semana
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            daysOfWeek().forEach { dayOfWeek ->
+            daysInWeek.forEach { day ->
                 Text(
-                    text = dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
+                    text = day,
                     modifier = Modifier.weight(1f),
                     textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        HorizontalCalendar(
-            state = state,
-            dayContent = { day ->
-                Day(
-                    day = day,
-                    onClick = { onDayClick(day) }
-                )
-            }
-        )
-    }
-}
+        // Dias do mês
+        val firstDayOfMonth = currentMonth.atDay(1)
+        val firstDayOfWeek = firstDayOfMonth.dayOfWeek.value % 7
+        val totalDays = currentMonth.lengthOfMonth()
+        val totalWeeks = (totalDays + firstDayOfWeek + 6) / 7
 
-@Composable
-private fun Day(
-    day: CalendarDay,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier
-            .aspectRatio(1f)
-            .padding(2.dp)
-            .clickable(
-                enabled = day.position == DayPosition.MonthDate,
-                onClick = onClick
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        if (day.position == DayPosition.MonthDate) {
-            Text(
-                text = day.date.dayOfMonth.toString(),
-                style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center
-            )
+        repeat(totalWeeks) { week ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                repeat(7) { dayOfWeek ->
+                    val day = week * 7 + dayOfWeek - firstDayOfWeek + 1
+                    val date = if (day in 1..totalDays) {
+                        currentMonth.atDay(day)
+                    } else null
+
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .aspectRatio(1f)
+                            .padding(2.dp)
+                            .then(
+                                if (date != null) {
+                                    Modifier.clickable { onDayClick(date) }
+                                } else Modifier
+                            )
+                            .background(
+                                when {
+                                    date == selectedDate -> MaterialTheme.colorScheme.primary
+                                    date in markedDates -> MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                                    date == today -> MaterialTheme.colorScheme.primaryContainer
+                                    else -> Color.Transparent
+                                },
+                                shape = CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (date != null) {
+                            Text(
+                                text = date.dayOfMonth.toString(),
+                                color = when {
+                                    date == selectedDate -> MaterialTheme.colorScheme.onPrimary
+                                    date in markedDates -> MaterialTheme.colorScheme.onPrimary
+                                    date == today -> MaterialTheme.colorScheme.onPrimaryContainer
+                                    else -> LocalContentColor.current
+                                },
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 } 

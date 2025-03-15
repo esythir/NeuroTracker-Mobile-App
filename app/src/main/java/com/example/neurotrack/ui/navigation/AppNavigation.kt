@@ -11,8 +11,8 @@ import com.example.neurotrack.navigation.NavRoutes
 import com.example.neurotrack.ui.components.BottomBar
 import com.example.neurotrack.ui.screens.addscreen.AddScreen
 import com.example.neurotrack.ui.screens.DashboardScreen
-import com.example.neurotrack.ui.screens.HistoryScreen
-import com.example.neurotrack.ui.screens.HomeScreen
+import com.example.neurotrack.ui.screens.history.HistoryScreen
+import com.example.neurotrack.ui.screens.home.HomeScreen
 import com.example.neurotrack.ui.screens.calendar.CalendarScreen
 
 @Composable
