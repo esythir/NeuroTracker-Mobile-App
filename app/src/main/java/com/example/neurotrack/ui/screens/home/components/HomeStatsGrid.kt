@@ -1,4 +1,4 @@
-package com.example.neurotrack.ui.components
+package com.example.neurotrack.ui.screens.home.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -53,8 +53,9 @@ fun HomeStatsGrid(
         ) {
             // Card 3
             StatsCard(
-                icon = Icons.Default.Star,
-                label = "Metas",
+                icon = Icons.Default.Favorite,
+                label = "Registros",
+                value = recordCount.toString(),
                 onClick = { /* TODO */ },
                 modifier = Modifier.weight(1f)
             )

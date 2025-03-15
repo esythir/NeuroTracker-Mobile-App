@@ -1,4 +1,4 @@
-package com.example.neurotrack.ui.components
+package com.example.neurotrack.ui.screens.home.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
