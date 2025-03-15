@@ -14,37 +14,43 @@ import com.example.neurotrack.ui.screens.DashboardScreen
 import com.example.neurotrack.ui.screens.history.HistoryScreen
 import com.example.neurotrack.ui.screens.home.HomeScreen
 import com.example.neurotrack.ui.screens.calendar.CalendarScreen
+import androidx.navigation.NavHostController
 
 @Composable
-fun AppNavigation() {
-    val navController = rememberNavController()
+fun AppNavigation(
+    navController: NavHostController,
+    startDestination: String = NavRoutes.Home.route
+) {
+    NavHost(
+        navController = navController,
+        startDestination = startDestination
+    ) {
+        composable(NavRoutes.Home.route) {
+            HomeScreen()
+        }
 
-    Scaffold(
-        bottomBar = { BottomBar(navController) }
-    ) { paddingValues ->
-        NavHost(
-            navController = navController,
-            startDestination = NavRoutes.Home.route,
-            modifier = Modifier.padding(paddingValues)
-        ) {
-            composable(NavRoutes.Home.route) {
-                HomeScreen(
-                    onSettingsClick = { /* TODO */ },
-                    onDashboardClick = { navController.navigate(NavRoutes.Dashboard.route) }
-                )
-            }
-            composable(NavRoutes.History.route) {
-                HistoryScreen()
-            }
-            composable(NavRoutes.Add.route) {
-                AddScreen()
-            }
-            composable(NavRoutes.Calendar.route) {
-                CalendarScreen()
-            }
-            composable(NavRoutes.Dashboard.route) {
-                DashboardScreen()
-            }
+        composable(NavRoutes.History.route) {
+            HistoryScreen()
+        }
+
+        composable(NavRoutes.Add.route) {
+            AddScreen()
+        }
+
+        composable(NavRoutes.Calendar.route) {
+            CalendarScreen()
+        }
+
+        composable(NavRoutes.Dashboard.route) {
+            DashboardScreen()
         }
     }
+}
+
+sealed class Screen(val route: String) {
+    object Home : Screen("home")
+    object History : Screen("history")
+    object Add : Screen("add")
+    object Calendar : Screen("calendar")
+    object Dashboard : Screen("dashboard")
 }

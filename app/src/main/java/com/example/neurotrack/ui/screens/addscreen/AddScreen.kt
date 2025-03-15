@@ -1,10 +1,8 @@
 package com.example.neurotrack.ui.screens.addscreen
 
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,12 +27,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.text.SimpleDateFormat
 import java.util.*
+import org.koin.androidx.compose.koinViewModel
+import com.example.neurotrack.data.local.entity.Feeling
+import com.example.neurotrack.ui.model.UiFeeling
+import androidx.compose.ui.layout.Layout
+import kotlinx.coroutines.launch
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+
 @Composable
-fun AddScreen() {
-// States for user input
+fun AddScreen(
+    viewModel: AddViewModel = koinViewModel()
+) {
+    var showSuccessDialog by remember { mutableStateOf(false) }
     var selectedMood by remember { mutableStateOf<String?>(null) }
-    val selectedFeelings = remember { mutableStateListOf<Feeling>() }
-    val selectedIntensity = remember { mutableStateOf<Int?>(null) }
+    val selectedFeelings = remember { mutableStateListOf<UiFeeling>() }
+    var selectedIntensity by remember { mutableStateOf<Int?>(null) }
     val behaviorOptions = listOf("Seletividade Alimentar", "Crise Emocional", "Hiperatividade")
     val durationOptions = listOf("15 min", "30 min", "45 min", "1h", "1h30", "2h", "2h+")
     val triggerOptions = listOf("Sons altos", "Mudança brusca de rotina", "Fome", "Luz intensa", "Outro")
@@ -42,42 +51,38 @@ fun AddScreen() {
     var selectedDuration by remember { mutableStateOf("") }
     var selectedTrigger by remember { mutableStateOf("") }
 
-// For date/time, we'll store as string. Could also use libraries like Android datetime pickers.
     val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.getDefault())
     var dateTime by remember { mutableStateOf(dateFormat.format(Date())) }
 
     var observations by remember { mutableStateOf("") }
 
-// Prepare feelings list with their color codes
     val allFeelings = listOf(
-        Feeling("Medo", Color(0xFFFFE5E5)),
-        Feeling("Angústia", Color(0xFFFFE5E5)),
-        Feeling("Ansiedade", Color(0xFFFFF2E5)),
-        Feeling("Triste", Color(0xFFFFF2E5)),
-        Feeling("Irritado", Color(0xFFFFF2E5)),
-        Feeling("Estressado", Color(0xFFFFF2E5)),
-        Feeling("Sonolento", Color(0xFFE5EEFF)),
-        Feeling("Cansado", Color(0xFFE5EEFF)),
-        Feeling("Confuso", Color(0xFFE5EEFF)),
-        Feeling("Entediado", Color(0xFFE5FFE8)),
-        Feeling("Hiperfocado", Color(0xFFE5FFE8)),
-        Feeling("Pensativo", Color(0xFFE5FFE8)),
-        Feeling("Animado", Color(0xFFE5FFF8)),
-        Feeling("Feliz", Color(0xFFE5FFF8)),
-        Feeling("Confiante", Color(0xFFE5FFF8)),
-        Feeling("Grato", Color(0xFFE5FFF8)),
-        Feeling("Inspirado", Color(0xFFE5FFF8)),
-        Feeling("Tranquilo", Color(0xFFE5FFF8)),
+        UiFeeling("Medo", Color(0xFFFFE5E5)),
+        UiFeeling("Angústia", Color(0xFFFFE5E5)),
+        UiFeeling("Ansiedade", Color(0xFFFFF2E5)),
+        UiFeeling("Triste", Color(0xFFFFF2E5)),
+        UiFeeling("Irritado", Color(0xFFFFF2E5)),
+        UiFeeling("Estressado", Color(0xFFFFF2E5)),
+        UiFeeling("Sonolento", Color(0xFFE5EEFF)),
+        UiFeeling("Cansado", Color(0xFFE5EEFF)),
+        UiFeeling("Confuso", Color(0xFFE5EEFF)),
+        UiFeeling("Entediado", Color(0xFFE5FFE8)),
+        UiFeeling("Hiperfocado", Color(0xFFE5FFE8)),
+        UiFeeling("Pensativo", Color(0xFFE5FFE8)),
+        UiFeeling("Animado", Color(0xFFE5FFF8)),
+        UiFeeling("Feliz", Color(0xFFE5FFF8)),
+        UiFeeling("Confiante", Color(0xFFE5FFF8)),
+        UiFeeling("Grato", Color(0xFFE5FFF8)),
+        UiFeeling("Inspirado", Color(0xFFE5FFF8)),
+        UiFeeling("Tranquilo", Color(0xFFE5FFF8)),
     )
 
-// Compose UI
     Surface(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF5F5F5)),
         color = Color(0xFFF5F5F5)
     ) {
-        // Card-like container
         Box(
             modifier = Modifier
                 .padding(16.dp)
@@ -89,7 +94,6 @@ fun AddScreen() {
                     .verticalScroll(rememberScrollState())
                     .padding(20.dp)
             ) {
-                // Header
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
@@ -118,14 +122,9 @@ fun AddScreen() {
                     )
                 }
 
-                // Section: Emojis
+                Text("Como você está se sentindo hoje?", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 Text(
-                    text = "Como você está se sentindo hoje?",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Text(
-                    text = "Toque em um emoji para selecionar seu humor.",
+                    "Toque em um emoji para selecionar seu humor.",
                     fontSize = 13.sp,
                     color = Color(0xFF666666),
                     modifier = Modifier.padding(bottom = 15.dp, top = 0.dp)
@@ -142,7 +141,6 @@ fun AddScreen() {
                 }
                 Spacer(modifier = Modifier.height(40.dp))
 
-                // Section: Sentimentos Envolvidos (MultiSelect)
                 Text("Sentimentos Envolvidos", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 Text(
                     "Selecione os sentimentos relacionados ao seu humor.",
@@ -156,7 +154,6 @@ fun AddScreen() {
                 )
                 Spacer(modifier = Modifier.height(40.dp))
 
-                // Section: Nome do Comportamento
                 Text("Nome do Comportamento", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 Text("Selecione o comportamento predominante.", fontSize = 13.sp, color = Color(0xFF666666))
                 SingleSelectDropdown(
@@ -168,7 +165,6 @@ fun AddScreen() {
                 )
                 Spacer(modifier = Modifier.height(40.dp))
 
-                // Section: Duração
                 Text("Duração do Comportamento", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 Text("Selecione a duração em minutos.", fontSize = 13.sp, color = Color(0xFF666666))
                 SingleSelectDropdown(
@@ -180,7 +176,6 @@ fun AddScreen() {
                 )
                 Spacer(modifier = Modifier.height(40.dp))
 
-                // Section: Intensidade
                 Text("Intensidade do Comportamento", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 Text("Selecione a intensidade de 1 a 5.", fontSize = 13.sp, color = Color(0xFF666666))
                 Spacer(modifier = Modifier.height(10.dp))
@@ -198,12 +193,12 @@ fun AddScreen() {
                                     shape = CircleShape
                                 )
                                 .background(
-                                    if (selectedIntensity.value == num) Color(0xFFFFD700)
+                                    if (selectedIntensity == num) Color(0xFFFFD700)
                                     else Color.Transparent,
                                     CircleShape
                                 )
                                 .clickable {
-                                    selectedIntensity.value = num
+                                    selectedIntensity = num
                                 },
                             contentAlignment = Alignment.Center
                         ) {
@@ -213,7 +208,6 @@ fun AddScreen() {
                 }
                 Spacer(modifier = Modifier.height(40.dp))
 
-                // Section: Gatilho
                 Text("Gatilho do Comportamento", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 Text("Selecione o gatilho.", fontSize = 13.sp, color = Color(0xFF666666))
                 SingleSelectDropdown(
@@ -225,7 +219,6 @@ fun AddScreen() {
                 )
                 Spacer(modifier = Modifier.height(40.dp))
 
-                // Section: Data e Hora
                 Text("Data e Hora do Ocorrido", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 Text("Selecione a data e hora.", fontSize = 13.sp, color = Color(0xFF666666))
                 Spacer(modifier = Modifier.height(10.dp))
@@ -237,7 +230,6 @@ fun AddScreen() {
                 )
                 Spacer(modifier = Modifier.height(40.dp))
 
-                // Section: Observações
                 Text("Observações", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 Text("Adicione observações sobre o comportamento.", fontSize = 13.sp, color = Color(0xFF666666))
                 Spacer(modifier = Modifier.height(10.dp))
@@ -252,18 +244,18 @@ fun AddScreen() {
                 )
                 Spacer(modifier = Modifier.height(25.dp))
 
-                // Registrar button
                 Button(
                     onClick = {
-                        // Logging the data for demonstration
-                        println("Selected Mood: $selectedMood")
-                        println("Selected Feelings: ${selectedFeelings.map { it.text }}")
-                        println("Selected Behavior: $selectedBehavior")
-                        println("Selected Duration: $selectedDuration")
-                        println("Selected Intensity: ${selectedIntensity.value}")
-                        println("Selected Trigger: $selectedTrigger")
-                        println("Date/Time: $dateTime")
-                        println("Observations: $observations")
+                        viewModel.saveBehaviorRecord(
+                            behaviorId = 1,
+                            mood = selectedMood,
+                            feelings = selectedFeelings.map { it.text },
+                            intensity = selectedIntensity ?: 1,
+                            duration = selectedDuration,
+                            trigger = selectedTrigger,
+                            notes = observations
+                        )
+                        showSuccessDialog = true
                     },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(10.dp),
@@ -272,7 +264,6 @@ fun AddScreen() {
                     Text("Registrar Humor", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 }
 
-                // Cancel link
                 Spacer(modifier = Modifier.height(15.dp))
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     Text(
@@ -287,10 +278,45 @@ fun AddScreen() {
             }
         }
     }
+
+    if (showSuccessDialog) {
+        AlertDialog(
+            onDismissRequest = { showSuccessDialog = false },
+            icon = {
+                Icon(
+                    Icons.Filled.CheckCircle,
+                    contentDescription = "Sucesso",
+                    tint = Color.Green,
+                    modifier = Modifier.size(48.dp)
+                )
+            },
+            title = {
+                Text("Sucesso!")
+            },
+            text = {
+                Text("Seu registro foi salvo com sucesso.")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showSuccessDialog = false
+                        selectedMood = null
+                        selectedFeelings.clear()
+                        selectedIntensity = null
+                        selectedDuration = ""
+                        selectedTrigger = ""
+                        observations = ""
+                    }
+                ) {
+                    Text("OK")
+                }
+            }
+        )
+    }
 }
-// DATA CLASS FOR FEELINGS
+
 data class Feeling(val text: String, val color: Color)
-// EMOJI BUTTON
+
 @Composable
 fun EmojiButton(emoji: String, label: String, selectedMood: String?, onSelected: (String) -> Unit) {
     Column(
@@ -314,74 +340,114 @@ fun EmojiButton(emoji: String, label: String, selectedMood: String?, onSelected:
         Text(text = label, fontSize = 12.sp, color = Color(0xFF666666))
     }
 }
-// MULTI-SELECT DROPDOWN FOR FEELINGS
+
 @Composable
 fun MultiSelectDropdown(
-    allOptions: List<Feeling>,
-    selectedOptions: MutableList<Feeling>
+    allOptions: List<UiFeeling>,
+    selectedOptions: MutableList<UiFeeling>,
+    modifier: Modifier = Modifier
 ) {
-    var dropdownVisible by remember { mutableStateOf(false) }
-// Just show tags horizontally. If you want a more advanced layout, use FlowRow or LazyRow.
-    Column {
-        // Display selected tags
+    var expanded by remember { mutableStateOf(false) }
+
+    Column(modifier = modifier.fillMaxWidth()) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .border(1.dp, Color(0xFFCCCCCC), RoundedCornerShape(5.dp))
-                .padding(5.dp)
-                .clickable { dropdownVisible = !dropdownVisible }
+                .clickable { expanded = true }
+                .padding(16.dp)
         ) {
             if (selectedOptions.isEmpty()) {
                 Text(
-                    text = "Clique para selecionar sentimentos",
-                    color = Color(0xFFAAAAAA),
-                    fontSize = 14.sp
+                    text = "Selecione os sentimentos",
+                    color = Color(0xFFAAAAAA)
                 )
             } else {
-                Row(horizontalArrangement = Arrangement.Start, modifier = Modifier.wrapContentWidth()) {
-                    selectedOptions.forEach { feeling ->
-                        Box(
-                            modifier = Modifier
-                                .padding(end = 5.dp, bottom = 5.dp)
-                                .background(feeling.color, RoundedCornerShape(15.dp))
-                                .padding(horizontal = 8.dp, vertical = 4.dp),
-                        ) {
-                            Text(
-                                text = feeling.text + " ×",
-                                fontSize = 13.sp,
-                                modifier = Modifier.clickable {
-                                    // remove if clicked on X
-                                    selectedOptions.remove(feeling)
-                                }
-                            )
-                        }
-                    }
-                }
+                Text(
+                    text = selectedOptions.joinToString(", ") { it.text },
+                    color = Color.Black
+                )
             }
         }
 
-        // Dropdown list
         DropdownMenu(
-            expanded = dropdownVisible,
-            onDismissRequest = { dropdownVisible = false }
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier
+                .fillMaxWidth(0.5f)  // 50% da largura da tela
+                .heightIn(max = 300.dp)  // Altura máxima
         ) {
             allOptions.forEach { feeling ->
                 DropdownMenuItem(
                     text = { Text(feeling.text) },
                     onClick = {
-                        // Toggle selection
-                        if (selectedOptions.contains(feeling)) {
-                            selectedOptions.remove(feeling)
-                        } else {
+                        if (feeling !in selectedOptions) {
                             selectedOptions.add(feeling)
                         }
+                        expanded = false
                     }
                 )
             }
         }
     }
 }
-// SINGLE-SELECT DROPDOWN
+
+@Composable
+fun FlowRow(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    Layout(
+        modifier = modifier,
+        content = content
+    ) { measurables, constraints ->
+        val placeables = measurables.map { measurable ->
+            measurable.measure(constraints)
+        }
+        
+        layout(
+            width = constraints.maxWidth,
+            height = constraints.maxHeight
+        ) {
+            var xPosition = 0
+            var yPosition = 0
+            var maxHeight = 0
+
+            placeables.forEach { placeable ->
+                if (xPosition + placeable.width > constraints.maxWidth) {
+                    xPosition = 0
+                    yPosition += maxHeight
+                    maxHeight = 0
+                }
+                placeable.place(xPosition, yPosition)
+                xPosition += placeable.width
+                maxHeight = maxOf(maxHeight, placeable.height)
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Chip(
+    onClick: () -> Unit,
+    label: @Composable () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        onClick = onClick,
+        shape = MaterialTheme.shapes.small,
+        color = MaterialTheme.colorScheme.secondaryContainer,
+        modifier = modifier
+    ) {
+        Box(
+            modifier = Modifier.padding(8.dp)
+        ) {
+            label()
+        }
+    }
+}
+
 @Composable
 fun SingleSelectDropdown(
     modifier: Modifier = Modifier,
@@ -397,7 +463,6 @@ fun SingleSelectDropdown(
             .fillMaxWidth()
     ) {
         Column {
-            // Current selection
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -423,7 +488,6 @@ fun SingleSelectDropdown(
                 }
             }
 
-            // Dropdown
             DropdownMenu(
                 expanded = dropdownExpanded,
                 onDismissRequest = { dropdownExpanded = false },
@@ -442,9 +506,11 @@ fun SingleSelectDropdown(
         }
     }
 }
+
 @Preview
 @Composable
 fun AddScreenPreview() {
     MaterialTheme {
         AddScreen()
-    }}
+    }
+}
