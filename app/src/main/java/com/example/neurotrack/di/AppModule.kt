@@ -24,7 +24,7 @@ val appModule = module {
     single { ConvertApiRepository() }
 
     // Preferences
-    single { UserPreferencesManager(get()) }
+    single { UserPreferencesManager(androidContext()) }
 
     // ViewModels
     viewModel { SettingsViewModel(get(), get()) }

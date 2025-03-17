@@ -49,7 +49,7 @@ fun RecordsList(
             LazyColumn(
                 modifier = modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(16.dp)
+                contentPadding = PaddingValues(8.dp)
             ) {
                 items(records) { record ->
                     EnhancedRecordItem(

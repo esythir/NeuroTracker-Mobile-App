@@ -23,7 +23,7 @@ import androidx.navigation.NavController
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(
-    userName: String = "João Silva",
+    userName: String,
     navController: NavController
 ) {
     Surface(

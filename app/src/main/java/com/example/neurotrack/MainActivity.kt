@@ -22,6 +22,11 @@ import androidx.navigation.compose.rememberNavController
 import com.example.neurotrack.ui.navigation.AppNavigation
 import com.example.neurotrack.ui.navigation.Screen
 import com.example.neurotrack.ui.theme.NeuroTrackTheme
+import com.example.neurotrack.ui.components.TopBar
+import com.example.neurotrack.ui.screens.onboarding.OnboardingScreen
+import com.example.neurotrack.data.preferences.UserPreferencesManager
+import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
@@ -67,11 +72,16 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainContent() {
+    val userPreferencesManager = koinInject<UserPreferencesManager>()
+    val isOnboardingCompleted by userPreferencesManager.isOnboardingCompleted.collectAsState(initial = false)
+    val userName by userPreferencesManager.userName.collectAsState(initial = "")
+
     NeuroTrackTheme {
         val navController = rememberNavController()
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination
 
+        // Define bottom navigation items
         val items = listOf(
             Screen.Home to Icons.Default.Home,
             Screen.History to Icons.Default.History,
@@ -79,37 +89,43 @@ fun MainContent() {
             Screen.Calendar to Icons.Default.CalendarMonth,
             Screen.Dashboard to Icons.Default.Dashboard
         )
-
-        Scaffold(
-            modifier = Modifier.fillMaxSize(),
-            bottomBar = {
-                NavigationBar {
-                    items.forEach { (screen, icon) ->
-                        NavigationBarItem(
-                            icon = { Icon(icon, contentDescription = screen.route) },
-                            label = { Text(screen.route.capitalize()) },
-                            selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
-                            onClick = {
-                                navController.navigate(screen.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
+        
+        // Show onboarding or main content based on completion status
+        if (!isOnboardingCompleted) {
+            // Just show the OnboardingScreen directly
+            OnboardingScreen()
+        } else {
+            // Main app content with its own NavHost
+            Scaffold(
+                bottomBar = {
+                    NavigationBar {
+                        items.forEach { (screen, icon) ->
+                            NavigationBarItem(
+                                icon = { Icon(icon, contentDescription = screen.route) },
+                                label = { Text(screen.route.capitalize()) },
+                                selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                                onClick = {
+                                    navController.navigate(screen.route) {
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = true
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
                 }
-            }
-        ) { paddingValues ->
-            Surface(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                color = MaterialTheme.colorScheme.background
-            ) {
-                AppNavigation(navController = navController)
+            ) { paddingValues ->
+                Surface(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    AppNavigation(navController = navController)
+                }
             }
         }
     }

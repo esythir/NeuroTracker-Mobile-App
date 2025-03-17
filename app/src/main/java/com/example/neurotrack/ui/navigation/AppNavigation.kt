@@ -22,6 +22,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.neurotrack.ui.screens.dashboard.DashboardViewModel
 import com.example.neurotrack.ui.screens.settings.SettingsScreen
 import org.koin.androidx.compose.getViewModel
+import com.example.neurotrack.ui.screens.onboarding.OnboardingScreen
 
 @Composable
 fun AppNavigation(navController: NavHostController) {
@@ -108,6 +109,10 @@ fun AppNavigation(navController: NavHostController) {
                 navController = navController
             )
         }
+
+        composable("onboarding") {
+            OnboardingScreen()
+        }
     }
 }
 
@@ -119,4 +124,5 @@ sealed class Screen(val route: String) {
     object Dashboard : Screen("dashboard")
     object Detail : Screen("detail")
     object Settings : Screen("settings")
+    object Onboarding : Screen("onboarding")
 }

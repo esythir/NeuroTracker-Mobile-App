@@ -21,6 +21,8 @@ import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
 import java.io.File
 import androidx.navigation.NavController
+import org.koin.compose.koinInject
+import com.example.neurotrack.data.preferences.UserPreferencesManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,6 +36,9 @@ fun SettingsScreen(
     val notificationsEnabled by viewModel.notificationsEnabled.collectAsState()
     var dataExportDialogVisible by remember { mutableStateOf(false) }
     var aboutDialogVisible by remember { mutableStateOf(false) }
+    
+    val userPreferencesManager = koinInject<UserPreferencesManager>()
+    val userName by userPreferencesManager.userName.collectAsState(initial = "")
     
     // Launcher para salvar o arquivo PDF
     val savePdfLauncher = rememberLauncherForActivityResult(
@@ -78,7 +83,7 @@ fun SettingsScreen(
             SettingsSection(title = "") {
                 SettingsCard(
                     icon = Icons.Default.Person,
-                    title = "João Silva",
+                    title = userName,
                     subtitle = "Editar perfil",
                     onClick = { /* Implementar edição de perfil */ }
                 )

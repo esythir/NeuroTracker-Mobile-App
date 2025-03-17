@@ -14,6 +14,9 @@ import com.example.neurotrack.ui.components.RecordsList
 import com.example.neurotrack.ui.components.TopBar
 import org.koin.androidx.compose.getViewModel
 import androidx.navigation.NavController
+import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
+import com.example.neurotrack.data.preferences.UserPreferencesManager
 
 @Composable
 fun HomeScreen(
@@ -22,6 +25,8 @@ fun HomeScreen(
 ) {
     val viewModel = getViewModel<HomeViewModel>()
     val state by viewModel.state.collectAsState()
+    val userPreferencesManager = koinInject<UserPreferencesManager>()
+    val userName by userPreferencesManager.userName.collectAsState(initial = "")
 
     Box(
         modifier = modifier
@@ -34,7 +39,7 @@ fun HomeScreen(
         ) {
             // Adicionar a TopBar com o botão de configurações
             TopBar(
-                userName = "João Silva", // Você pode obter isso do ViewModel
+                userName = userName,
                 navController = navController
             )
             
