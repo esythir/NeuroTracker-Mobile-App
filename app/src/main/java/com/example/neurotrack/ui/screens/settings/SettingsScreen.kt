@@ -20,14 +20,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
 import java.io.File
+import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    viewModel: SettingsViewModel = koinViewModel(),
-    onNavigateBack: () -> Unit,
-    userName: String = "João Silva",
-    modifier: Modifier = Modifier
+    navController: NavController,
+    viewModel: SettingsViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
     val state by viewModel.state.collectAsState()
@@ -57,10 +56,10 @@ fun SettingsScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
+            CenterAlignedTopAppBar(
                 title = { Text("Configurações") },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
+                    IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Voltar"
@@ -70,197 +69,108 @@ fun SettingsScreen(
             )
         }
     ) { paddingValues ->
-        LazyColumn(
-            modifier = modifier
+        Column(
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Perfil do usuário
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Person,
-                            contentDescription = null,
-                            modifier = Modifier.size(48.dp)
-                        )
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Column {
-                            Text(
-                                text = userName,
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                text = "Editar perfil",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    }
-                }
-            }
-            
-            item { Spacer(modifier = Modifier.height(16.dp)) }
-            
-            // Seção de Aparência
-            item {
-                Text(
-                    text = "Aparência",
-                    style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier.padding(top = 24.dp, bottom = 16.dp)
+            // Perfil
+            SettingsSection(title = "") {
+                SettingsCard(
+                    icon = Icons.Default.Person,
+                    title = "João Silva",
+                    subtitle = "Editar perfil",
+                    onClick = { /* Implementar edição de perfil */ }
                 )
             }
             
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.DarkMode,
-                            contentDescription = "Modo Escuro"
-                        )
-                        
-                        Column(
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(start = 16.dp)
-                        ) {
-                            Text(
-                                text = "Modo escuro",
-                                style = MaterialTheme.typography.titleMedium
-                            )
-                            Text(
-                                text = "Ativar tema escuro no aplicativo",
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
-                        
-                        Switch(
-                            checked = darkMode,
-                            onCheckedChange = { viewModel.toggleDarkMode() }
-                        )
-                    }
-                }
-            }
-            
-            item { Divider() }
-            
-            // Seção de Notificações
-            item {
-                Text(
-                    text = "Notificações",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 16.dp)
+            // Aparência
+            SettingsSection(title = "Aparência") {
+                SettingsSwitchCard(
+                    icon = Icons.Default.DarkMode,
+                    title = "Modo escuro",
+                    subtitle = "Ativar tema escuro no aplicativo",
+                    checked = darkMode,
+                    onCheckedChange = { viewModel.toggleDarkMode() }
                 )
             }
             
-            item {
-                SettingsSwitchItem(
+            // Notificações
+            SettingsSection(title = "Notificações") {
+                SettingsSwitchCard(
                     icon = Icons.Default.Notifications,
                     title = "Lembretes diários",
-                    description = "Receber lembretes para registrar comportamentos",
+                    subtitle = "Receber lembretes para registrar comportamentos",
                     checked = notificationsEnabled,
                     onCheckedChange = { viewModel.toggleNotifications() }
                 )
             }
             
-            item { Divider() }
-            
-            // Seção de Dados
-            item {
-                Text(
-                    text = "Dados",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-            }
-            
-            item {
-                SettingsClickableItem(
+            // Dados
+            SettingsSection(title = "Dados") {
+                SettingsCard(
                     icon = Icons.Default.CloudDownload,
                     title = "Exportar dados",
-                    description = "Exportar registros para arquivo CSV",
-                    onClick = { dataExportDialogVisible = true }
+                    subtitle = "Exportar registros para arquivo CSV",
+                    onClick = { viewModel.exportDataToCsv(context) }
                 )
-            }
-            
-            item {
-                SettingsClickableItem(
+                
+                SettingsCard(
                     icon = Icons.Default.Delete,
                     title = "Limpar dados",
-                    description = "Apagar todos os registros",
-                    onClick = { /* Mostrar diálogo de confirmação */ }
+                    subtitle = "Apagar todos os registros",
+                    onClick = { /* Implementar limpeza de dados */ }
                 )
             }
             
-            item { Divider() }
-            
-            // Seção de Sobre
-            item {
-                Text(
-                    text = "Sobre",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-            }
-            
-            item {
-                SettingsClickableItem(
+            // Sobre
+            SettingsSection(title = "Sobre") {
+                SettingsCard(
                     icon = Icons.Default.Info,
                     title = "Sobre o NeuroTracker",
-                    description = "Versão 1.0.0",
+                    subtitle = "Versão 1.0.0",
                     onClick = { aboutDialogVisible = true }
-                )
-            }
-            
-            item {
-                SettingsClickableItem(
-                    icon = Icons.Default.Email,
-                    title = "Contato",
-                    description = "Enviar feedback ou relatar problemas",
-                    onClick = { /* Abrir email */ }
                 )
             }
         }
     }
     
-    // Diálogo de exportação de dados
-    if (dataExportDialogVisible) {
+    // Diálogos
+    if (state.showShareDialog) {
         AlertDialog(
-            onDismissRequest = { dataExportDialogVisible = false },
-            title = { Text("Exportar dados") },
-            text = { Text("Seus dados serão exportados para um arquivo CSV que você poderá compartilhar.") },
+            onDismissRequest = { viewModel.dismissShareDialog() },
+            title = { Text("Exportação concluída") },
+            text = { 
+                Text("Os dados foram exportados com sucesso. Deseja compartilhar o arquivo?") 
+            },
             confirmButton = {
-                TextButton(onClick = {
-                    // Lógica para exportar dados
-                    dataExportDialogVisible = false
-                }) {
-                    Text("Exportar")
+                TextButton(
+                    onClick = { 
+                        viewModel.shareExportedFile(context)
+                        viewModel.dismissShareDialog()
+                    }
+                ) {
+                    Text("Compartilhar")
                 }
             },
             dismissButton = {
-                TextButton(onClick = { dataExportDialogVisible = false }) {
-                    Text("Cancelar")
+                TextButton(onClick = { viewModel.dismissShareDialog() }) {
+                    Text("Fechar")
+                }
+            }
+        )
+    }
+    
+    if (state.showConversionErrorDialog) {
+        AlertDialog(
+            onDismissRequest = { viewModel.dismissErrorDialog() },
+            title = { Text("Erro na exportação") },
+            text = { 
+                Text(state.conversionError ?: "Ocorreu um erro ao exportar os dados.") 
+            },
+            confirmButton = {
+                TextButton(onClick = { viewModel.dismissErrorDialog() }) {
+                    Text("OK")
                 }
             }
         )
@@ -287,181 +197,118 @@ fun SettingsScreen(
             }
         )
     }
-    
-    // Diálogo de compartilhamento
-    if (state.showShareDialog) {
-        AlertDialog(
-            onDismissRequest = { viewModel.dismissShareDialog() },
-            title = { Text("Exportação concluída") },
-            text = { Text("Seus dados foram exportados com sucesso. Deseja compartilhar o arquivo CSV?") },
-            confirmButton = {
-                Button(onClick = { viewModel.shareCSVFile() }) {
-                    Text("Compartilhar")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { viewModel.dismissShareDialog() }) {
-                    Text("Fechar")
-                }
-            }
-        )
-    }
-    
-    // Diálogo de confirmação de limpeza
-    if (state.showClearConfirmation) {
-        AlertDialog(
-            onDismissRequest = { viewModel.dismissClearConfirmation() },
-            title = { Text("Dados limpos") },
-            text = { Text("Todos os seus registros foram apagados com sucesso.") },
-            confirmButton = {
-                Button(onClick = { viewModel.dismissClearConfirmation() }) {
-                    Text("OK")
-                }
-            }
-        )
-    }
-    
-    // No diálogo de sucesso da conversão, adicione um botão para abrir o PDF
-    if (state.showConversionSuccessDialog) {
-        AlertDialog(
-            onDismissRequest = { viewModel.dismissConversionSuccessDialog() },
-            title = { Text("Conversão Concluída") },
-            text = { 
-                Text("O arquivo foi convertido com sucesso. O que deseja fazer?") 
-            },
-            confirmButton = {
-                Column {
-                    Button(
-                        onClick = {
-                            // Iniciar intent para salvar o arquivo
-                            val intent = viewModel.createSaveFileIntent()
-                            savePdfLauncher.launch(intent)
-                        },
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
-                    ) {
-                        Text("Salvar em...")
-                    }
-                    
-                    Button(
-                        onClick = {
-                            viewModel.sharePdfFile(context)
-                        },
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
-                    ) {
-                        Text("Compartilhar")
-                    }
-                    
-                    Button(
-                        onClick = {
-                            viewModel.openPdfFile(context)
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Visualizar PDF")
-                    }
-                }
-            },
-            dismissButton = {
-                Button(onClick = { viewModel.dismissConversionSuccessDialog() }) {
-                    Text("Fechar")
-                }
-            }
-        )
-    }
+}
 
-    if (state.showConversionErrorDialog) {
-        AlertDialog(
-            onDismissRequest = { viewModel.dismissConversionErrorDialog() },
-            title = { Text("Erro na Conversão") },
-            text = { 
-                Text("Ocorreu um erro durante a conversão:\n${state.conversionError}") 
-            },
-            confirmButton = {
-                Button(onClick = { viewModel.dismissConversionErrorDialog() }) {
-                    Text("OK")
-                }
-            }
-        )
+@Composable
+fun SettingsSection(
+    title: String,
+    content: @Composable () -> Unit
+) {
+    Column(modifier = Modifier.padding(vertical = 8.dp)) {
+        if (title.isNotEmpty()) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            )
+        }
+        content()
     }
 }
 
 @Composable
-fun SettingsSwitchItem(
-    icon: ImageVector,
+fun SettingsCard(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
     title: String,
-    description: String,
+    subtitle: String,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp)
+            .clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Icon(
+                imageVector = Icons.Default.ChevronRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+fun SettingsSwitchCard(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    title: String,
+    subtitle: String,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
-    Row(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            modifier = Modifier.size(24.dp)
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Column(
-            modifier = Modifier.weight(1f)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.bodyLarge
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary
             )
-            Text(
-                text = description,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Switch(
+                checked = checked,
+                onCheckedChange = onCheckedChange
             )
         }
-        Switch(
-            checked = checked,
-            onCheckedChange = onCheckedChange
-        )
-    }
-}
-
-@Composable
-fun SettingsClickableItem(
-    icon: ImageVector,
-    title: String,
-    description: String,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            modifier = Modifier.size(24.dp)
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Text(
-                text = description,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-        Icon(
-            imageVector = Icons.Default.ChevronRight,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
-        )
     }
 } 

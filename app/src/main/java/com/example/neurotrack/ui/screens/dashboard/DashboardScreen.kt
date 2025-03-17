@@ -127,11 +127,11 @@ fun DashboardScreen(
             MoodDistributionCard(
                 data = state.moodDistribution,
                 colors = mapOf(
-                    "Ótimo" to Color(0xFF4CAF50),
-                    "Bem" to Color(0xFF8BC34A),
+                    "Feliz" to Color(0xFF4CAF50),
                     "Neutro" to Color(0xFFFFEB3B),
-                    "Mal" to Color(0xFFFF9800),
-                    "Péssimo" to Color(0xFFF44336)
+                    "Triste" to Color(0xFF8BC34A),
+                    "Irritado" to Color(0xFFFF9800),
+                    "Ansioso" to Color(0xFFF44336)
                 )
             )
             

@@ -103,9 +103,9 @@ fun AppNavigation(navController: NavHostController) {
 
         composable(
             route = Screen.Settings.route
-        ) {
+        ) { backStackEntry ->
             SettingsScreen(
-                onNavigateBack = { navController.popBackStack() }
+                navController = navController
             )
         }
     }

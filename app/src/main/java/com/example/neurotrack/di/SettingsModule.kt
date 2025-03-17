@@ -10,5 +10,5 @@ import org.koin.dsl.module
 val settingsModule = module {
     single { DataExportRepository(get(), get()) }
     single { UserPreferencesManager(get()) }
-    viewModel { SettingsViewModel(get<ConvertApiRepository>()) }
+    viewModel { SettingsViewModel(get<ConvertApiRepository>(), get<DataExportRepository>()) }
 } 

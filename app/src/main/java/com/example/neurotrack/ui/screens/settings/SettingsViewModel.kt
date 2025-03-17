@@ -11,11 +11,15 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.neurotrack.data.repository.ConvertApiRepository
+import com.example.neurotrack.data.repository.DataExportRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.io.File
+import java.io.FileWriter
+import androidx.core.content.FileProvider
+import android.os.Environment
 
 data class SettingsState(
     val showShareDialog: Boolean = false,
@@ -28,7 +32,8 @@ data class SettingsState(
 )
 
 class SettingsViewModel(
-    private val convertApiRepository: ConvertApiRepository
+    private val convertApiRepository: ConvertApiRepository,
+    private val dataExportRepository: DataExportRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow(SettingsState())
     val state: StateFlow<SettingsState> = _state.asStateFlow()
@@ -47,31 +52,76 @@ class SettingsViewModel(
         _notificationsEnabled.value = !_notificationsEnabled.value
     }
 
-    fun exportData() {
-        _state.value = _state.value.copy(
-            showShareDialog = true,
-            exportedFilePath = "/storage/emulated/0/Download/neurotrack_data.csv"
-        )
+    fun exportDataToCsv(context: Context) {
+        viewModelScope.launch {
+            try {
+                // Usar o DataExportRepository existente para exportar dados
+                val result = dataExportRepository.exportDataToCSV()
+                
+                result.fold(
+                    onSuccess = { file ->
+                        // Copiar o arquivo para o diretório de downloads
+                        val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                        if (!downloadsDir.exists()) {
+                            downloadsDir.mkdirs()
+                        }
+                        
+                        val fileName = "neurotracker_data_${System.currentTimeMillis()}.csv"
+                        val destinationFile = File(downloadsDir, fileName)
+                        
+                        file.copyTo(destinationFile, overwrite = true)
+                        
+                        // Atualizar o estado com o caminho do arquivo exportado
+                        _state.value = _state.value.copy(
+                            exportedFilePath = destinationFile.absolutePath,
+                            showShareDialog = true
+                        )
+                    },
+                    onFailure = { error ->
+                        // Em caso de erro, atualizar o estado
+                        _state.value = _state.value.copy(
+                            conversionError = "Erro ao exportar dados: ${error.message}",
+                            showConversionErrorDialog = true
+                        )
+                    }
+                )
+            } catch (e: Exception) {
+                // Em caso de erro, atualizar o estado
+                _state.value = _state.value.copy(
+                    conversionError = "Erro ao exportar dados: ${e.message}",
+                    showConversionErrorDialog = true
+                )
+            }
+        }
     }
-
-    fun shareCSVFile() {
-        // Simulação de compartilhamento
-        dismissShareDialog()
+    
+    fun shareExportedFile(context: Context) {
+        state.value.exportedFilePath?.let { filePath ->
+            val file = File(filePath)
+            val uri = FileProvider.getUriForFile(
+                context,
+                "${context.packageName}.fileprovider",
+                file
+            )
+            
+            val intent = Intent(Intent.ACTION_SEND).apply {
+                type = "text/csv"
+                putExtra(Intent.EXTRA_STREAM, uri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            
+            context.startActivity(Intent.createChooser(intent, "Compartilhar arquivo CSV"))
+        }
     }
-
+    
     fun dismissShareDialog() {
         _state.value = _state.value.copy(showShareDialog = false)
     }
-
-    fun clearData() {
-        // Simulação de limpeza de dados
-        _state.value = _state.value.copy(showClearConfirmation = true)
-    }
-
-    fun dismissClearConfirmation() {
-        _state.value = _state.value.copy(showClearConfirmation = false)
-    }
     
+    fun dismissErrorDialog() {
+        _state.value = _state.value.copy(showConversionErrorDialog = false)
+    }
+
     fun convertCsvToPdf(context: Context) {
         viewModelScope.launch {
             val result = convertApiRepository.convertCsvToPdf(context)
@@ -120,10 +170,6 @@ class SettingsViewModel(
         _state.value = _state.value.copy(showConversionSuccessDialog = false)
     }
     
-    fun dismissConversionErrorDialog() {
-        _state.value = _state.value.copy(showConversionErrorDialog = false)
-    }
-    
     fun requestStoragePermissions(activity: Activity) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (activity.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -144,6 +190,10 @@ class SettingsViewModel(
         } else {
             true
         }
+    }
+
+    fun dismissClearConfirmation() {
+        _state.value = _state.value.copy(showClearConfirmation = false)
     }
 
     companion object {

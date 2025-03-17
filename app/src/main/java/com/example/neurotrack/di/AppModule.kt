@@ -11,6 +11,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import com.example.neurotrack.ui.screens.settings.SettingsViewModel
+import com.example.neurotrack.ui.screens.dashboard.DashboardViewModel
 
 val appModule = module {
     // Services
@@ -26,5 +27,6 @@ val appModule = module {
     single { UserPreferencesManager(get()) }
 
     // ViewModels
-    viewModel { SettingsViewModel(get()) }
+    viewModel { SettingsViewModel(get(), get()) }
+    viewModel { DashboardViewModel(get()) }
 } 
