@@ -18,6 +18,10 @@ import com.example.neurotrack.ui.screens.home.HomeScreen
 import com.example.neurotrack.ui.screens.calendar.CalendarScreen
 import androidx.navigation.NavHostController
 import java.time.LocalDate
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.neurotrack.ui.screens.dashboard.DashboardViewModel
+import com.example.neurotrack.ui.screens.settings.SettingsScreen
+import org.koin.androidx.compose.getViewModel
 
 @Composable
 fun AppNavigation(navController: NavHostController) {
@@ -26,7 +30,7 @@ fun AppNavigation(navController: NavHostController) {
         startDestination = Screen.Home.route
     ) {
         composable(Screen.Home.route) {
-            HomeScreen()
+            HomeScreen(navController = navController)
         }
 
         composable(Screen.Calendar.route) {
@@ -90,8 +94,19 @@ fun AppNavigation(navController: NavHostController) {
             HistoryScreen()
         }
 
-        composable(Screen.Dashboard.route) {
-            DashboardScreen()
+        composable(
+            route = Screen.Dashboard.route
+        ) {
+            val viewModel = getViewModel<DashboardViewModel>()
+            DashboardScreen(viewModel = viewModel)
+        }
+
+        composable(
+            route = Screen.Settings.route
+        ) {
+            SettingsScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
     }
 }
@@ -103,4 +118,5 @@ sealed class Screen(val route: String) {
     object Calendar : Screen("calendar")
     object Dashboard : Screen("dashboard")
     object Detail : Screen("detail")
+    object Settings : Screen("settings")
 }

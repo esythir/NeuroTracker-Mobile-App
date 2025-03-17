@@ -1,8 +1,13 @@
 package com.example.neurotrack
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -16,58 +21,95 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.neurotrack.ui.navigation.AppNavigation
 import com.example.neurotrack.ui.navigation.Screen
-import com.example.neurotrack.ui.theme.NeuroTrackerTheme
+import com.example.neurotrack.ui.theme.NeuroTrackTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
+    private val STORAGE_PERMISSION_CODE = 101
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            NeuroTrackerTheme {
-                val navController = rememberNavController()
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = navBackStackEntry?.destination
-
-                val items = listOf(
-                    Screen.Home to Icons.Default.Home,
-                    Screen.History to Icons.Default.History,
-                    Screen.Add to Icons.Default.Add,
-                    Screen.Calendar to Icons.Default.CalendarMonth,
-                    Screen.Dashboard to Icons.Default.Dashboard
+        
+        // Verificar e solicitar permissões
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(
+                    arrayOf(
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_EXTERNAL_STORAGE
+                    ),
+                    101
                 )
+            }
+        }
+        
+        setContent {
+            MainContent()
+        }
+    }
 
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    bottomBar = {
-                        NavigationBar {
-                            items.forEach { (screen, icon) ->
-                                NavigationBarItem(
-                                    icon = { Icon(icon, contentDescription = screen.route) },
-                                    label = { Text(screen.route.capitalize()) },
-                                    selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
-                                    onClick = {
-                                        navController.navigate(screen.route) {
-                                            popUpTo(navController.graph.findStartDestination().id) {
-                                                saveState = true
-                                            }
-                                            launchSingleTop = true
-                                            restoreState = true
-                                        }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == STORAGE_PERMISSION_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Permissão de armazenamento concedida", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Permissão de armazenamento negada", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MainContent() {
+    NeuroTrackTheme {
+        val navController = rememberNavController()
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentDestination = navBackStackEntry?.destination
+
+        val items = listOf(
+            Screen.Home to Icons.Default.Home,
+            Screen.History to Icons.Default.History,
+            Screen.Add to Icons.Default.Add,
+            Screen.Calendar to Icons.Default.CalendarMonth,
+            Screen.Dashboard to Icons.Default.Dashboard
+        )
+
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            bottomBar = {
+                NavigationBar {
+                    items.forEach { (screen, icon) ->
+                        NavigationBarItem(
+                            icon = { Icon(icon, contentDescription = screen.route) },
+                            label = { Text(screen.route.capitalize()) },
+                            selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                            onClick = {
+                                navController.navigate(screen.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
                                     }
-                                )
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
                             }
-                        }
-                    }
-                ) { paddingValues ->
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(paddingValues),
-                        color = MaterialTheme.colorScheme.background
-                    ) {
-                        AppNavigation(navController = navController)
+                        )
                     }
                 }
+            }
+        ) { paddingValues ->
+            Surface(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                color = MaterialTheme.colorScheme.background
+            ) {
+                AppNavigation(navController = navController)
             }
         }
     }

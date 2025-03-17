@@ -42,6 +42,7 @@ import org.koin.core.parameter.parametersOf
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import androidx.compose.ui.window.DialogProperties
+import com.example.neurotrack.ui.screens.addscreen.components.EmojiSelector
 
 @Composable
 fun AddScreen(
@@ -79,25 +80,25 @@ fun AddScreen(
 
     var observations by remember { mutableStateOf("") }
 
-    val allFeelings = listOf(
-        UiFeeling("Medo", Color(0xFFFFE5E5)),
-        UiFeeling("Angústia", Color(0xFFFFE5E5)),
-        UiFeeling("Ansiedade", Color(0xFFFFF2E5)),
-        UiFeeling("Triste", Color(0xFFFFF2E5)),
-        UiFeeling("Irritado", Color(0xFFFFF2E5)),
-        UiFeeling("Estressado", Color(0xFFFFF2E5)),
-        UiFeeling("Sonolento", Color(0xFFE5EEFF)),
-        UiFeeling("Cansado", Color(0xFFE5EEFF)),
-        UiFeeling("Confuso", Color(0xFFE5EEFF)),
-        UiFeeling("Entediado", Color(0xFFE5FFE8)),
-        UiFeeling("Hiperfocado", Color(0xFFE5FFE8)),
-        UiFeeling("Pensativo", Color(0xFFE5FFE8)),
-        UiFeeling("Animado", Color(0xFFE5FFF8)),
-        UiFeeling("Feliz", Color(0xFFE5FFF8)),
-        UiFeeling("Confiante", Color(0xFFE5FFF8)),
-        UiFeeling("Grato", Color(0xFFE5FFF8)),
-        UiFeeling("Inspirado", Color(0xFFE5FFF8)),
-        UiFeeling("Tranquilo", Color(0xFFE5FFF8)),
+    val feelings = listOf(
+        UiFeeling(1, "Feliz", Color(0xFF4CAF50)),
+        UiFeeling(2, "Triste", Color(0xFF2196F3)),
+        UiFeeling(3, "Irritado", Color(0xFFF44336)),
+        UiFeeling(4, "Ansioso", Color(0xFFFF9800)),
+        UiFeeling(5, "Calmo", Color(0xFF03A9F4)),
+        UiFeeling(6, "Confuso", Color(0xFF9C27B0)),
+        UiFeeling(7, "Entediado", Color(0xFF607D8B)),
+        UiFeeling(8, "Esperançoso", Color(0xFF8BC34A)),
+        UiFeeling(9, "Frustrado", Color(0xFFE91E63)),
+        UiFeeling(10, "Grato", Color(0xFF009688)),
+        UiFeeling(11, "Inseguro", Color(0xFFFF5722)),
+        UiFeeling(12, "Motivado", Color(0xFF3F51B5)),
+        UiFeeling(13, "Orgulhoso", Color(0xFFCDDC39)),
+        UiFeeling(14, "Preocupado", Color(0xFF795548)),
+        UiFeeling(15, "Relaxado", Color(0xFF00BCD4)),
+        UiFeeling(16, "Sobrecarregado", Color(0xFF673AB7)),
+        UiFeeling(17, "Solitário", Color(0xFF9E9E9E)),
+        UiFeeling(18, "Surpreso", Color(0xFFFFEB3B))
     )
 
     Surface(
@@ -145,24 +146,27 @@ fun AddScreen(
                     )
                 }
 
-                Text("Como o paciente está se sentindo hoje?", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 Text(
-                    "Toque em um emoji para selecionar o humor do paciente.",
-                    fontSize = 13.sp,
-                    color = Color(0xFF666666),
-                    modifier = Modifier.padding(bottom = 15.dp, top = 0.dp)
+                    text = "Como você está se sentindo?",
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(vertical = 16.dp)
                 )
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    EmojiButton("😢", "Péssimo", selectedMood) { selectedMood = it }
-                    EmojiButton("😕", "Mal", selectedMood) { selectedMood = it }
-                    EmojiButton("😐", "Okay", selectedMood) { selectedMood = it }
-                    EmojiButton("🙂", "Bem", selectedMood) { selectedMood = it }
-                    EmojiButton("😄", "Ótimo", selectedMood) { selectedMood = it }
-                }
-                Spacer(modifier = Modifier.height(40.dp))
+                
+                // Lista de emojis para seleção de humor
+                val emojis = listOf(
+                    "😊" to "Feliz",
+                    "😐" to "Neutro",
+                    "😔" to "Triste",
+                    "😡" to "Irritado",
+                    "😰" to "Ansioso"
+                )
+                
+                EmojiSelector(
+                    emojis = emojis,
+                    selectedMood = selectedMood,
+                    onSelected = { mood -> selectedMood = mood },
+                    modifier = Modifier.padding(vertical = 16.dp)
+                )
 
                 Text("Sentimentos Envolvidos", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 Text(
@@ -172,7 +176,7 @@ fun AddScreen(
                     modifier = Modifier.padding(bottom = 15.dp)
                 )
                 MultiSelectDropdown(
-                    allOptions = allFeelings,
+                    allOptions = feelings,
                     selectedOptions = selectedFeelings
                 )
                 Spacer(modifier = Modifier.height(40.dp))
@@ -237,7 +241,9 @@ fun AddScreen(
                     modifier = Modifier.padding(top = 8.dp),
                     options = triggerOptions,
                     selectedOption = selectedTrigger,
-                    onSelect = { selectedTrigger = it },
+                    onSelect = { newValue -> 
+                        selectedTrigger = newValue  // Atualize a variável de estado
+                    },
                     placeholder = "Selecione o gatilho"
                 )
                 Spacer(modifier = Modifier.height(40.dp))
@@ -263,14 +269,14 @@ fun AddScreen(
                 Text("Observações adicionais", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 Text("Adicione notas sobre o comportamento do paciente.", fontSize = 13.sp, color = Color(0xFF666666))
                 Spacer(modifier = Modifier.height(10.dp))
-                OutlinedTextField(
+                TextField(
                     value = observations,
                     onValueChange = { observations = it },
-                    placeholder = { Text("Detalhes adicionais...") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp),
-                    textStyle = LocalTextStyle.current.copy(fontSize = 14.sp),
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TextFieldDefaults.colors(
+                        unfocusedContainerColor = Color(0xFFF5F5F5),
+                        focusedContainerColor = Color(0xFFF5F5F5)
+                    )
                 )
                 Spacer(modifier = Modifier.height(25.dp))
 
@@ -331,7 +337,7 @@ fun AddScreen(
                         viewModel.saveBehaviorRecord(
                             behaviorId = 1,
                             mood = selectedMood,
-                            feelings = selectedFeelings.map { it.text },
+                            feelings = selectedFeelings.map { it.name },
                             intensity = selectedIntensity ?: 1,
                             duration = selectedDuration,
                             trigger = selectedTrigger,
@@ -459,7 +465,7 @@ fun MultiSelectDropdown(
                 )
             } else {
                 Text(
-                    text = selectedOptions.joinToString(", ") { it.text },
+                    text = selectedOptions.joinToString(", ") { it.name },
                     color = Color.Black
                 )
             }
@@ -474,7 +480,7 @@ fun MultiSelectDropdown(
         ) {
             allOptions.forEach { feeling ->
                 DropdownMenuItem(
-                    text = { Text(feeling.text) },
+                    text = { Text(feeling.name) },
                     onClick = {
                         if (feeling !in selectedOptions) {
                             selectedOptions.add(feeling)

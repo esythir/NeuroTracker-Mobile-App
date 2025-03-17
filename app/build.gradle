@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace 'com.example.neurotrack'
-    compileSdk 35
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.example.neurotrack"
         minSdk 24
-        targetSdk 35
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -116,6 +116,15 @@ dependencies {
 
     // Gemini AI
     implementation "com.google.ai.client.generativeai:generativeai:0.2.1"
+
+    // MPAndroidChart
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+
+    // Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.11.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.11.0'
 }
 
 kapt {
