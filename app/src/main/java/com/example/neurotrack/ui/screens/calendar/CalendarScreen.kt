@@ -5,7 +5,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.neurotrack.ui.components.RecordsList
 import com.example.neurotrack.ui.screens.calendar.components.CalendarContent
@@ -81,17 +83,49 @@ fun CalendarScreen(
                     modifier = Modifier.padding(16.dp)
                 )
 
-                RecordsList(
-                    records = state.records,
-                    onRecordClick = { record -> onNavigateToDetail(record.id) },
-                    onRefresh = { 
-                        state.selectedDate?.let { viewModel.selectDate(it) }
-                    },
-                    isRefreshing = state.isLoading,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 16.dp)
-                )
+                if (state.isLoading) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                } else if (state.records.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "Nenhum registro encontrado",
+                                style = MaterialTheme.typography.bodyLarge,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Adicione novos registros para visualizá-los aqui",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                } else {
+                    RecordsList(
+                        records = state.records,
+                        onRecordClick = { record -> onNavigateToDetail(record.id) },
+                        onRefresh = { viewModel.selectDate(state.selectedDate!!) },
+                        isRefreshing = state.isLoading,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                }
             }
         }
     }
