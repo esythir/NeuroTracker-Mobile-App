@@ -28,7 +28,6 @@ fun HomeTopBar(
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Avatar e Nome
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -49,10 +48,8 @@ fun HomeTopBar(
                 )
             }
             
-            // Espaço flexível
             Spacer(modifier = Modifier.weight(1f))
             
-            // Ícone de configurações
             IconButton(onClick = onSettingsClick) {
                 Icon(
                     imageVector = Icons.Default.Settings,

@@ -13,6 +13,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
 import java.time.ZoneId
+import java.time.ZoneOffset
 
 class CalendarViewModel(
     private val behaviorRecordDao: BehaviorRecordDao
@@ -30,8 +31,43 @@ class CalendarViewModel(
     }
 
     fun selectDate(date: LocalDate) {
-        _state.update { it.copy(selectedDate = date) }
-        loadRecordsForDate(date)
+        viewModelScope.launch {
+            _state.update { it.copy(
+                selectedDate = date,
+                isLoading = true,
+                records = emptyList()
+            ) }
+            
+            try {
+                val startOfDay = date.atStartOfDay().toInstant(ZoneOffset.UTC).epochSecond
+                val endOfDay = date.atTime(23, 59, 59).toInstant(ZoneOffset.UTC).epochSecond
+                
+                behaviorRecordDao.getBehaviorRecordsBetweenDates(startOfDay, endOfDay)
+                    .collect { records ->
+                        val mappedRecords = records.map { record ->
+                            Record(
+                                id = record.id.toLong(),
+                                title = record.mood ?: "Sem humor registrado",
+                                description = record.notes ?: "Sem observações",
+                                timestamp = LocalDateTime.ofInstant(
+                                    Instant.ofEpochSecond(record.timestamp),
+                                    ZoneId.systemDefault()
+                                ),
+                                score = record.intensity
+                            )
+                        }
+                        _state.update { it.copy(
+                            records = mappedRecords,
+                            isLoading = false 
+                        ) }
+                    }
+            } catch (e: Exception) {
+                _state.update { it.copy(
+                    isLoading = false,
+                    records = emptyList()
+                ) }
+            }
+        }
     }
 
     private fun loadCurrentMonth() {
@@ -61,40 +97,6 @@ class CalendarViewModel(
                         }.toSet()
 
                         _state.update { it.copy(markedDates = markedDates) }
-                    }
-            } finally {
-                _state.update { it.copy(isLoading = false) }
-            }
-        }
-    }
-
-    private fun loadRecordsForDate(date: LocalDate) {
-        viewModelScope.launch {
-            _state.update { it.copy(isLoading = true) }
-            
-            try {
-                val startOfDay = date.atStartOfDay()
-                    .atZone(ZoneId.systemDefault())
-                    .toEpochSecond()
-                val endOfDay = date.plusDays(1).atStartOfDay()
-                    .atZone(ZoneId.systemDefault())
-                    .toEpochSecond()
-
-                behaviorRecordDao.getBehaviorRecordsBetweenDates(startOfDay, endOfDay)
-                    .collect { records ->
-                        val mappedRecords = records.map { record ->
-                            Record(
-                                id = record.id.toLong(),
-                                title = record.mood ?: "Sem humor registrado",
-                                description = record.notes ?: "Sem observações",
-                                timestamp = LocalDateTime.ofInstant(
-                                    Instant.ofEpochSecond(record.timestamp),
-                                    ZoneId.systemDefault()
-                                ),
-                                score = record.intensity
-                            )
-                        }
-                        _state.update { it.copy(records = mappedRecords) }
                     }
             } finally {
                 _state.update { it.copy(isLoading = false) }

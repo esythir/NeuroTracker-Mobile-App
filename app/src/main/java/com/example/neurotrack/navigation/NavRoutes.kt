@@ -9,10 +9,10 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed class NavRoutes(val route: String, val icon: ImageVector, val contentDescription: String) {
-    object Home : NavRoutes("home", Icons.Default.Home, "Home")
-    object History : NavRoutes("history", Icons.Default.History, "History")
-    object Add : NavRoutes("add", Icons.Default.Add, "Add")
-    object Calendar : NavRoutes("calendar", Icons.Default.CalendarMonth, "Calendar")
+    object Home : NavRoutes("home", Icons.Default.Home, "Início")
+    object History : NavRoutes("history", Icons.Default.History, "Histórico")
+    object Add : NavRoutes("add", Icons.Default.Add, "Adicionar")
+    object Calendar : NavRoutes("calendar", Icons.Default.CalendarMonth, "Calendário")
     object Dashboard : NavRoutes("dashboard", Icons.Default.Dashboard, "Dashboard")
 
     companion object {

@@ -33,4 +33,7 @@ interface BehaviorRecordDao {
 
     @Query("SELECT * FROM behavior_records WHERE timestamp >= :timestamp ORDER BY timestamp DESC")
     suspend fun getBehaviorRecordsAfterDate(timestamp: Long): List<BehaviorRecord>
+
+    @Query("DELETE FROM behavior_records")
+    suspend fun deleteAllBehaviorRecords()
 } 

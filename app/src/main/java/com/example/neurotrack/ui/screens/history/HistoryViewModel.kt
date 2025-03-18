@@ -55,10 +55,6 @@ class HistoryViewModel(
             }
         }
     }
-
-    fun onRecordClick(record: Record) {
-        // TODO: Implementar navegação para detalhes do registro
-    }
 }
 
 data class HistoryState(

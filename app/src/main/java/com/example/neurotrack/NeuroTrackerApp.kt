@@ -5,6 +5,8 @@ import com.example.neurotrack.di.appModule
 import com.example.neurotrack.di.databaseModule
 import com.example.neurotrack.di.viewModelModule
 import com.example.neurotrack.di.dashboardModule
+import com.example.neurotrack.di.settingsModule
+import com.example.neurotrack.di.apiModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -19,8 +21,10 @@ class NeuroTrackerApp : Application() {
             modules(listOf(
                 appModule,
                 databaseModule,
+                apiModule,
                 viewModelModule,
-                dashboardModule
+                dashboardModule,
+                settingsModule
             ))
         }
     }

@@ -18,6 +18,11 @@ import com.example.neurotrack.ui.screens.home.HomeScreen
 import com.example.neurotrack.ui.screens.calendar.CalendarScreen
 import androidx.navigation.NavHostController
 import java.time.LocalDate
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.neurotrack.ui.screens.dashboard.DashboardViewModel
+import com.example.neurotrack.ui.screens.settings.SettingsScreen
+import org.koin.androidx.compose.getViewModel
+import com.example.neurotrack.ui.screens.onboarding.OnboardingScreen
 
 @Composable
 fun AppNavigation(navController: NavHostController) {
@@ -26,7 +31,7 @@ fun AppNavigation(navController: NavHostController) {
         startDestination = Screen.Home.route
     ) {
         composable(Screen.Home.route) {
-            HomeScreen()
+            HomeScreen(navController = navController)
         }
 
         composable(Screen.Calendar.route) {
@@ -36,6 +41,7 @@ fun AppNavigation(navController: NavHostController) {
                 ?.let { LocalDate.parse(it) }
 
             CalendarScreen(
+                navController = navController,
                 onNavigateToAdd = { date, isFromCalendar ->
                     navController.navigate("${Screen.Add.route}?date=${date}&fromCalendar=${isFromCalendar}")
                 },
@@ -86,12 +92,29 @@ fun AppNavigation(navController: NavHostController) {
             )
         }
 
-        composable(Screen.History.route) {
-            HistoryScreen()
+        composable(NavRoutes.History.route) {
+            HistoryScreen(
+                navController = navController
+            )
         }
 
-        composable(Screen.Dashboard.route) {
-            DashboardScreen()
+        composable(
+            route = Screen.Dashboard.route
+        ) {
+            val viewModel = getViewModel<DashboardViewModel>()
+            DashboardScreen(viewModel = viewModel)
+        }
+
+        composable(
+            route = Screen.Settings.route
+        ) { backStackEntry ->
+            SettingsScreen(
+                navController = navController
+            )
+        }
+
+        composable("onboarding") {
+            OnboardingScreen()
         }
     }
 }
@@ -103,4 +126,6 @@ sealed class Screen(val route: String) {
     object Calendar : Screen("calendar")
     object Dashboard : Screen("dashboard")
     object Detail : Screen("detail")
+    object Settings : Screen("settings")
+    object Onboarding : Screen("onboarding")
 }

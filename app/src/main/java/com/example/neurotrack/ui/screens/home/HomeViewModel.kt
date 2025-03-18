@@ -48,7 +48,6 @@ class HomeViewModel(
                             records.sumOf { it.intensity }.toFloat() / totalRecords
                         } else 0f
 
-                        // Calcula o humor predominante
                         val moodFrequency = records
                             .groupBy { it.mood }
                             .mapValues { it.value.size }
@@ -89,9 +88,5 @@ class HomeViewModel(
                 _state.update { it.copy(isRefreshing = false) }
             }
         }
-    }
-
-    fun onRecordClick(record: Record) {
-        // TODO: Implementar navegação para detalhes do registro
     }
 } 
