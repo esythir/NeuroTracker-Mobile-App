@@ -7,11 +7,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.neurotrack.ui.components.RecordsList
 import org.koin.androidx.compose.koinViewModel
+import androidx.navigation.NavController
 
 @Composable
 fun HistoryScreen(
     modifier: Modifier = Modifier,
-    viewModel: HistoryViewModel = koinViewModel()
+    viewModel: HistoryViewModel = koinViewModel(),
+    navController: NavController
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -28,9 +30,10 @@ fun HistoryScreen(
 
         RecordsList(
             records = state.records,
-            onRecordClick = { record -> viewModel.onRecordClick(record) },
-            onRefresh = { viewModel.onRefresh() },
-            isRefreshing = state.isRefreshing
+            onRecordClick = { recordId -> 
+                navController.navigate("record_details/$recordId") 
+            },
+            modifier = Modifier.padding(horizontal = 16.dp)
         )
     }
 } 

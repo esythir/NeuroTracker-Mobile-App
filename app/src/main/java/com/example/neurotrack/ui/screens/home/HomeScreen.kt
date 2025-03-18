@@ -37,19 +37,16 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            // Adicionar a TopBar com o botão de configurações
             TopBar(
                 userName = userName,
                 navController = navController
             )
             
-            // Conteúdo principal com padding
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 16.dp)
             ) {
-                // Cards de estatísticas com sombra e cantos arredondados
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -67,7 +64,6 @@ fun HomeScreen(
                     )
                 }
                 
-                // Título da seção de registros recentes
                 Text(
                     text = "Registros Recentes",
                     style = MaterialTheme.typography.titleLarge,
@@ -75,7 +71,6 @@ fun HomeScreen(
                     modifier = Modifier.padding(vertical = 12.dp)
                 )
                 
-                // Lista de registros com design melhorado
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -87,10 +82,10 @@ fun HomeScreen(
                 ) {
                     RecordsList(
                         records = state.records,
-                        onRecordClick = { record -> viewModel.onRecordClick(record) },
-                        onRefresh = { viewModel.onRefresh() },
-                        isRefreshing = state.isRefreshing,
-                        modifier = Modifier.fillMaxSize()
+                        onRecordClick = { recordId -> 
+                            navController.navigate("record_details/$recordId") 
+                        },
+                        modifier = Modifier.padding(horizontal = 16.dp)
                     )
                 }
             }

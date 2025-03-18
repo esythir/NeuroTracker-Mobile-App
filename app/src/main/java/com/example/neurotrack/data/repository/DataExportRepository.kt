@@ -19,13 +19,10 @@ class DataExportRepository(
 ) {
     suspend fun exportDataToCSV(): Result<File> = withContext(Dispatchers.IO) {
         try {
-            // 1. Obter todos os registros do banco de dados
             val records = behaviorRecordDao.getAllBehaviorRecords().first()
             
-            // 2. Criar arquivo CSV diretamente
             val csvFile = createCSVFile(records)
             
-            // 3. Retornar o arquivo CSV
             Result.success(csvFile)
         } catch (e: Exception) {
             Result.failure(e)
@@ -33,15 +30,11 @@ class DataExportRepository(
     }
     
     private fun createCSVFile(records: List<BehaviorRecord>): File {
-        // Criar um arquivo CSV
         val csvFile = File(context.cacheDir, "behavior_records.csv")
         
-        // Criar o conteúdo CSV
         val csvContent = buildString {
-            // Cabeçalho
             append("ID,Behavior ID,Timestamp,Mood,Feelings,Intensity,Duration,Trigger,Notes\n")
             
-            // Dados
             records.forEach { record ->
                 val timestamp = LocalDateTime.ofInstant(
                     Instant.ofEpochSecond(record.timestamp),
@@ -60,7 +53,6 @@ class DataExportRepository(
             }
         }
         
-        // Escrever o conteúdo CSV no arquivo
         FileOutputStream(csvFile).use { it.write(csvContent.toByteArray()) }
         
         return csvFile
@@ -68,7 +60,6 @@ class DataExportRepository(
     
     suspend fun clearAllData(): Result<Unit> = withContext(Dispatchers.IO) {
         try {
-            // Apagar todos os registros do banco de dados
             behaviorRecordDao.deleteAllBehaviorRecords()
             Result.success(Unit)
         } catch (e: Exception) {

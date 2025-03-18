@@ -41,6 +41,7 @@ fun AppNavigation(navController: NavHostController) {
                 ?.let { LocalDate.parse(it) }
 
             CalendarScreen(
+                navController = navController,
                 onNavigateToAdd = { date, isFromCalendar ->
                     navController.navigate("${Screen.Add.route}?date=${date}&fromCalendar=${isFromCalendar}")
                 },
@@ -91,8 +92,10 @@ fun AppNavigation(navController: NavHostController) {
             )
         }
 
-        composable(Screen.History.route) {
-            HistoryScreen()
+        composable(NavRoutes.History.route) {
+            HistoryScreen(
+                navController = navController
+            )
         }
 
         composable(

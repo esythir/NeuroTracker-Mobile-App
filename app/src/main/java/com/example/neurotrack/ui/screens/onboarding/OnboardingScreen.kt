@@ -38,7 +38,6 @@ fun OnboardingScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Logo ou ícone do app
         Image(
             painter = painterResource(id = R.drawable.ic_launcher_foreground),
             contentDescription = "App Logo",
@@ -47,7 +46,6 @@ fun OnboardingScreen(
                 .padding(bottom = 24.dp)
         )
         
-        // Título de boas-vindas
         Text(
             text = "Bem-vindo ao NeuroTracker",
             style = MaterialTheme.typography.headlineMedium,
@@ -56,7 +54,6 @@ fun OnboardingScreen(
             modifier = Modifier.padding(bottom = 16.dp)
         )
         
-        // Descrição
         Text(
             text = "Acompanhe comportamentos e emoções de forma simples e eficaz.",
             style = MaterialTheme.typography.bodyLarge,
@@ -64,7 +61,6 @@ fun OnboardingScreen(
             modifier = Modifier.padding(bottom = 32.dp)
         )
         
-        // Campo para inserir o nome
         OutlinedTextField(
             value = userName,
             onValueChange = { 
@@ -82,27 +78,21 @@ fun OnboardingScreen(
                 .padding(bottom = 24.dp)
         )
         
-        // Botão para começar
         Button(
             onClick = {
                 if (userName.isBlank()) {
                     showError = true
                 } else {
-                    // Use coroutine scope to handle async operations
                     scope.launch {
                         try {
-                            // Save user name first
                             viewModel.saveUserName(userName)
-                            // Then mark onboarding as completed
                             viewModel.completeOnboarding()
                             
-                            // Restart the activity to go to the home screen
                             val intent = Intent(context, MainActivity::class.java)
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
                             context.startActivity(intent)
                             (context as? Activity)?.finish()
                         } catch (e: Exception) {
-                            // Handle any exceptions
                             e.printStackTrace()
                         }
                     }

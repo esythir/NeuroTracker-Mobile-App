@@ -15,64 +15,53 @@ data class UserPreferences(
 
 class UserPreferencesManager(private val context: Context) {
     
-    // SharedPreferences for all settings
     private val prefs: SharedPreferences = context.getSharedPreferences("neurotrack_prefs", Context.MODE_PRIVATE)
     
     private val _preferencesFlow = MutableStateFlow(getUserPreferences())
     val userPreferencesFlow: StateFlow<UserPreferences> = _preferencesFlow
     
-    // Flow to observe onboarding completion status
     val isOnboardingCompleted: Flow<Boolean> = flow {
         emit(prefs.getBoolean("onboarding_completed", false))
     }
     
-    // Flow to observe user name
     val userName: Flow<String> = flow {
         emit(prefs.getString("user_name", "") ?: "")
     }
     
-    // Get user preferences from SharedPreferences
     private fun getUserPreferences(): UserPreferences {
         val useDarkTheme = prefs.getBoolean("dark_mode", false)
         val notificationsEnabled = prefs.getBoolean("notifications_enabled", true)
         return UserPreferences(useDarkTheme = useDarkTheme, notificationsEnabled = notificationsEnabled)
     }
     
-    // Update dark theme preference
     suspend fun updateDarkTheme(useDarkTheme: Boolean) {
         prefs.edit().putBoolean("dark_mode", useDarkTheme).apply()
         _preferencesFlow.value = getUserPreferences()
     }
     
-    // Get dark mode setting
     fun getDarkMode(): Boolean {
         return prefs.getBoolean("dark_mode", false)
     }
     
-    // Get notifications setting
     fun getNotificationsEnabled(): Boolean {
         return prefs.getBoolean("notifications_enabled", true)
     }
     
-    // Toggle dark mode
     suspend fun toggleDarkMode() {
         val currentMode = getDarkMode()
         updateDarkTheme(!currentMode)
     }
     
-    // Toggle notifications
     suspend fun toggleNotifications() {
         val current = getNotificationsEnabled()
         prefs.edit().putBoolean("notifications_enabled", !current).apply()
         _preferencesFlow.value = getUserPreferences()
     }
     
-    // Mark onboarding as completed
     suspend fun completeOnboarding() {
         prefs.edit().putBoolean("onboarding_completed", true).apply()
     }
     
-    // Save user name
     suspend fun saveUserName(name: String) {
         prefs.edit().putString("user_name", name).apply()
     }

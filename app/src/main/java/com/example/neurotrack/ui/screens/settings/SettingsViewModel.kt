@@ -55,12 +55,10 @@ class SettingsViewModel(
     fun exportDataToCsv(context: Context) {
         viewModelScope.launch {
             try {
-                // Usar o DataExportRepository existente para exportar dados
                 val result = dataExportRepository.exportDataToCSV()
                 
                 result.fold(
                     onSuccess = { file ->
-                        // Copiar o arquivo para o diretório de downloads
                         val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
                         if (!downloadsDir.exists()) {
                             downloadsDir.mkdirs()
@@ -71,14 +69,12 @@ class SettingsViewModel(
                         
                         file.copyTo(destinationFile, overwrite = true)
                         
-                        // Atualizar o estado com o caminho do arquivo exportado
                         _state.value = _state.value.copy(
                             exportedFilePath = destinationFile.absolutePath,
                             showShareDialog = true
                         )
                     },
                     onFailure = { error ->
-                        // Em caso de erro, atualizar o estado
                         _state.value = _state.value.copy(
                             conversionError = "Erro ao exportar dados: ${error.message}",
                             showConversionErrorDialog = true
@@ -86,7 +82,6 @@ class SettingsViewModel(
                     }
                 )
             } catch (e: Exception) {
-                // Em caso de erro, atualizar o estado
                 _state.value = _state.value.copy(
                     conversionError = "Erro ao exportar dados: ${e.message}",
                     showConversionErrorDialog = true

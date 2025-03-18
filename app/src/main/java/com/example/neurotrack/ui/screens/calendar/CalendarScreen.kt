@@ -15,6 +15,7 @@ import com.example.neurotrack.ui.screens.calendar.components.CalendarHeader
 import com.example.neurotrack.ui.screens.calendar.viewmodel.CalendarViewModel
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
+import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -23,11 +24,11 @@ fun CalendarScreen(
     onNavigateToDetail: (Long) -> Unit,
     initialSelectedDate: LocalDate? = null,
     modifier: Modifier = Modifier,
-    viewModel: CalendarViewModel = koinViewModel()
+    viewModel: CalendarViewModel = koinViewModel(),
+    navController: NavController
 ) {
     val state by viewModel.state.collectAsState()
 
-    // Efeito para selecionar a data inicial
     LaunchedEffect(initialSelectedDate) {
         initialSelectedDate?.let { date ->
             viewModel.selectDate(date)
@@ -53,7 +54,6 @@ fun CalendarScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Cabeçalho do Calendário
             CalendarHeader(
                 currentMonth = state.currentMonth,
                 onPreviousMonth = { viewModel.updateMonth(state.currentMonth.minusMonths(1)) },
@@ -61,7 +61,6 @@ fun CalendarScreen(
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
 
-            // Calendário
             CalendarContent(
                 currentMonth = state.currentMonth,
                 selectedDate = state.selectedDate,
@@ -73,7 +72,6 @@ fun CalendarScreen(
                     .fillMaxWidth()
             )
 
-            // Lista de Registros
             if (state.selectedDate != null) {
                 Divider(modifier = Modifier.padding(horizontal = 16.dp))
                 
@@ -120,9 +118,9 @@ fun CalendarScreen(
                 } else {
                     RecordsList(
                         records = state.records,
-                        onRecordClick = { record -> onNavigateToDetail(record.id) },
-                        onRefresh = { viewModel.selectDate(state.selectedDate!!) },
-                        isRefreshing = state.isLoading,
+                        onRecordClick = { recordId -> 
+                            navController.navigate("record_details/$recordId")
+                        },
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
                 }

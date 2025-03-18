@@ -34,7 +34,6 @@ fun CalendarHeader(
             )
         }
         
-        // Traduzir o nome do mês para português
         val monthName = when (currentMonth.monthValue) {
             1 -> "Janeiro"
             2 -> "Fevereiro"

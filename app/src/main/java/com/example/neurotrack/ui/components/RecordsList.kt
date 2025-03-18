@@ -34,14 +34,12 @@ data class Record(
 @Composable
 fun RecordsList(
     records: List<Record>,
-    onRecordClick: (Record) -> Unit,
-    onRefresh: () -> Unit,
-    isRefreshing: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onRecordClick: (Long) -> Unit = {}
 ) {
     SwipeRefresh(
-        state = rememberSwipeRefreshState(isRefreshing),
-        onRefresh = onRefresh,
+        state = rememberSwipeRefreshState(false),
+        onRefresh = { },
     ) {
         if (records.isEmpty()) {
             EmptyRecordsMessage(modifier = modifier)
@@ -54,7 +52,7 @@ fun RecordsList(
                 items(records) { record ->
                     EnhancedRecordItem(
                         record = record,
-                        onClick = { onRecordClick(record) }
+                        onClick = { onRecordClick(record.id) }
                     )
                 }
             }
@@ -105,7 +103,6 @@ private fun EnhancedRecordItem(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Indicador de humor/intensidade
                 Box(
                     modifier = Modifier
                         .size(40.dp)
@@ -122,7 +119,6 @@ private fun EnhancedRecordItem(
                 
                 Spacer(modifier = Modifier.width(12.dp))
                 
-                // Título e data
                 Column(
                     modifier = Modifier.weight(1f)
                 ) {
@@ -143,7 +139,6 @@ private fun EnhancedRecordItem(
                     )
                 }
                 
-                // Ícone de seta
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowRight,
                     contentDescription = "Ver detalhes",
@@ -159,7 +154,6 @@ private fun EnhancedRecordItem(
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
                 )
                 
-                // Descrição
                 Text(
                     text = record.description,
                     style = MaterialTheme.typography.bodyMedium,

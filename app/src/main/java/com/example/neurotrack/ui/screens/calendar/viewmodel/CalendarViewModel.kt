@@ -35,7 +35,7 @@ class CalendarViewModel(
             _state.update { it.copy(
                 selectedDate = date,
                 isLoading = true,
-                records = emptyList() // Limpar registros anteriores enquanto carrega
+                records = emptyList()
             ) }
             
             try {
@@ -58,11 +58,10 @@ class CalendarViewModel(
                         }
                         _state.update { it.copy(
                             records = mappedRecords,
-                            isLoading = false  // Importante: desativar o loading quando terminar
+                            isLoading = false 
                         ) }
                     }
             } catch (e: Exception) {
-                // Em caso de erro, também desativar o loading
                 _state.update { it.copy(
                     isLoading = false,
                     records = emptyList()

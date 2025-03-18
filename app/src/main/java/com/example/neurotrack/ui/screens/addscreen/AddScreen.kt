@@ -152,7 +152,6 @@ fun AddScreen(
                     modifier = Modifier.padding(vertical = 16.dp)
                 )
                 
-                // Lista de emojis para seleção de humor
                 val emojis = listOf(
                     "😊" to "Feliz",
                     "😐" to "Neutro",
@@ -242,7 +241,7 @@ fun AddScreen(
                     options = triggerOptions,
                     selectedOption = selectedTrigger,
                     onSelect = { newValue -> 
-                        selectedTrigger = newValue  // Atualize a variável de estado
+                        selectedTrigger = newValue  
                     },
                     placeholder = "Selecione o gatilho"
                 )
@@ -280,7 +279,6 @@ fun AddScreen(
                 )
                 Spacer(modifier = Modifier.height(25.dp))
 
-                // Dialog de sucesso padronizado
                 if (showSuccessDialog) {
                     AlertDialog(
                         onDismissRequest = { 
@@ -331,7 +329,6 @@ fun AddScreen(
                     )
                 }
 
-                // Botão de registrar
                 Button(
                     onClick = {
                         viewModel.saveBehaviorRecord(
@@ -375,17 +372,13 @@ fun AddScreen(
             title = { Text("Selecione a hora") },
             text = {
                 Column {
-                    // Se veio do calendário, mostra apenas seleção de hora
                     if (!isFromCalendarState) {
-                        // TODO: Adicionar DatePicker
                     }
                     
-                    // TimePicker customizado
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        // Horas
                         NumberPicker(
                             value = selectedDateTime.hour,
                             range = 0..23,
@@ -396,7 +389,6 @@ fun AddScreen(
                         
                         Text(":")
                         
-                        // Minutos
                         NumberPicker(
                             value = selectedDateTime.minute,
                             range = 0..59,
@@ -475,8 +467,8 @@ fun MultiSelectDropdown(
             expanded = expanded,
             onDismissRequest = { expanded = false },
             modifier = Modifier
-                .fillMaxWidth(0.5f)  // 50% da largura da tela
-                .heightIn(max = 300.dp)  // Altura máxima
+                .fillMaxWidth(0.5f)  
+                .heightIn(max = 300.dp)  
         ) {
             allOptions.forEach { feeling ->
                 DropdownMenuItem(

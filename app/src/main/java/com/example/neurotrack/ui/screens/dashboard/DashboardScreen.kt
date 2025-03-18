@@ -26,13 +26,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlin.math.min
 
-// Componentes personalizados para substituir os não encontrados
 @Composable
 fun LineChart(
     data: List<Pair<String, Float>>,
     modifier: Modifier = Modifier
 ) {
-    // Implementação simplificada de um gráfico de linha
     Box(modifier = modifier.fillMaxWidth().height(200.dp)) {
         Text("Gráfico de linha - dados simulados", modifier = Modifier.align(Alignment.Center))
     }
@@ -43,7 +41,6 @@ fun BarChart(
     data: List<Pair<String, Int>>,
     modifier: Modifier = Modifier
 ) {
-    // Implementação simplificada de um gráfico de barras
     Box(modifier = modifier.fillMaxWidth().height(200.dp)) {
         Text("Gráfico de barras - dados simulados", modifier = Modifier.align(Alignment.Center))
     }
@@ -108,22 +105,18 @@ fun DashboardScreen(
             
             Spacer(modifier = Modifier.height(8.dp))
             
-            // Card de resumo
             SummaryCard(totalRecords = state.totalRecords)
             
             Spacer(modifier = Modifier.height(8.dp))
             
-            // Card de insights
             InsightsCard(patterns = state.identifiedPatterns)
             
             Spacer(modifier = Modifier.height(8.dp))
             
-            // Card de intensidade ao longo do tempo
             IntensityOverTimeCard(data = state.intensityData)
             
             Spacer(modifier = Modifier.height(8.dp))
             
-            // Card de distribuição de humor
             MoodDistributionCard(
                 data = state.moodDistribution,
                 colors = mapOf(
@@ -136,18 +129,10 @@ fun DashboardScreen(
             )
             
             Spacer(modifier = Modifier.height(8.dp))
-            
-            // Novo card: Recomendações Personalizadas
             PersonalizedRecommendationsCard(recommendations = state.personalizedRecommendations)
-            
             Spacer(modifier = Modifier.height(8.dp))
-            
-            // Novo card: Padrões de Gatilhos
             TriggerPatternsCard(triggerAnalysis = state.triggerAnalysis)
-            
             Spacer(modifier = Modifier.height(8.dp))
-            
-            // Novo card: Progresso e Tendências
             ProgressTrendsCard(weeklyTrend = state.weeklyTrend, nextStepsSuggestions = state.nextStepsSuggestions)
         }
     }
@@ -231,7 +216,6 @@ fun IntensityOverTimeCard(data: List<Pair<String, Float>>) {
             )
             Spacer(modifier = Modifier.height(16.dp))
             
-            // Implementação do gráfico de linha
             LineChartImpl(
                 data = data,
                 modifier = Modifier
@@ -259,7 +243,6 @@ fun LineChartImpl(
             val minValue = data.minOf { it.second }
             val range = maxValue - minValue
             
-            // Desenhar linhas de grade horizontais
             val gridColor = Color.LightGray.copy(alpha = 0.5f)
             for (i in 0..5) {
                 val y = height - (height * i / 5f)
@@ -271,7 +254,6 @@ fun LineChartImpl(
                 )
             }
             
-            // Desenhar o caminho da linha
             val path = Path()
             val points = data.mapIndexed { index, (_, value) ->
                 val x = width * index / (data.size - 1)
@@ -280,16 +262,13 @@ fun LineChartImpl(
                 Offset(x, y)
             }
             
-            // Mover para o primeiro ponto
             if (points.isNotEmpty()) {
                 path.moveTo(points.first().x, points.first().y)
                 
-                // Conectar os pontos restantes
                 for (i in 1 until points.size) {
                     path.lineTo(points[i].x, points[i].y)
                 }
                 
-                // Desenhar a linha
                 drawPath(
                     path = path,
                     color = Color(0xFF673AB7),
@@ -299,7 +278,6 @@ fun LineChartImpl(
                     )
                 )
                 
-                // Desenhar pontos
                 points.forEach { point ->
                     drawCircle(
                         color = Color(0xFF673AB7),
@@ -310,7 +288,6 @@ fun LineChartImpl(
             }
         }
         
-        // Valores do eixo Y
         Column(
             modifier = Modifier
                 .align(Alignment.CenterStart)
@@ -333,7 +310,6 @@ fun LineChartImpl(
             }
         }
         
-        // Datas no eixo X
         Row(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -352,7 +328,6 @@ fun LineChartImpl(
             }
         }
         
-        // Legenda
         Row(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -403,7 +378,6 @@ fun MoodDistributionCard(
             
             Spacer(modifier = Modifier.height(16.dp))
             
-            // Legenda
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
@@ -561,7 +535,7 @@ fun ProgressTrendsCard(
                 color = when {
                     weeklyTrend > 0.5 -> Color(0xFFFF9800) // Laranja
                     weeklyTrend < -0.5 -> Color(0xFF4CAF50) // Verde
-                    else -> Color(0xFF000080) // Azul escuro (substituindo o amarelo)
+                    else -> Color(0xFF000080) // Azul escuro 
                 }
             )
             

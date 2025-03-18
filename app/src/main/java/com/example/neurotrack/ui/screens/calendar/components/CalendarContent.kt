@@ -47,7 +47,6 @@ fun CalendarContent(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            // Dias da semana
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -72,7 +71,6 @@ fun CalendarContent(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Dias do mês
             val firstDayOfMonth = currentMonth.atDay(1)
             val firstDayOfWeek = firstDayOfMonth.dayOfWeek.value % 7
             val totalDays = currentMonth.lengthOfMonth()

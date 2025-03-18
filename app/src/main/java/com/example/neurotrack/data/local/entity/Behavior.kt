@@ -13,6 +13,6 @@ data class Behavior(
 )
 
 enum class BehaviorType {
-    POSITIVE,    // Comportamentos que queremos aumentar
-    NEGATIVE     // Comportamentos que queremos diminuir
+    POSITIVE,    
+    NEGATIVE     
 } 

@@ -28,7 +28,6 @@ fun HomeStatsGrid(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Total de Registros
             StatsCard(
                 icon = Icons.Default.Assignment,
                 label = "Total Registros",
@@ -37,7 +36,6 @@ fun HomeStatsGrid(
                 modifier = Modifier.weight(1f)
             )
             
-            // Média de Pontuação
             StatsCard(
                 icon = Icons.Default.Stars,
                 label = "Média",
@@ -49,7 +47,6 @@ fun HomeStatsGrid(
         
         Spacer(modifier = Modifier.height(16.dp))
         
-        // Card largo do Humor Predominante
         Card(
             onClick = { /* TODO */ },
             modifier = Modifier.fillMaxWidth()

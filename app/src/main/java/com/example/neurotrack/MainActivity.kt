@@ -35,7 +35,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // Verificar e solicitar permissões
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(
@@ -81,7 +80,6 @@ fun MainContent() {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination
 
-        // Define bottom navigation items
         val items = listOf(
             Screen.Home to Icons.Default.Home,
             Screen.History to Icons.Default.History,
@@ -90,12 +88,9 @@ fun MainContent() {
             Screen.Dashboard to Icons.Default.Dashboard
         )
         
-        // Show onboarding or main content based on completion status
         if (!isOnboardingCompleted) {
-            // Just show the OnboardingScreen directly
             OnboardingScreen()
         } else {
-            // Main app content with its own NavHost
             Scaffold(
                 bottomBar = {
                     NavigationBar {

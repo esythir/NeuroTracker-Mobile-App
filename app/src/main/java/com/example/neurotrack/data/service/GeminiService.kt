@@ -31,7 +31,6 @@ class GeminiService(private val apiKey: String) {
                 )
             }
 
-            // Preparar os dados para enviar ao Gemini
             val recordsData = records.map { record ->
                 "ID: ${record.id}, " +
                 "Humor: ${record.mood ?: "Não especificado"}, " +
@@ -42,7 +41,6 @@ class GeminiService(private val apiKey: String) {
                 "Observações: ${record.notes ?: "Não especificado"}"
             }.joinToString("\n")
 
-            // Criar o prompt para o Gemini
             val prompt = """
                 Você é um assistente especializado em análise de comportamentos e padrões emocionais.
                 Analise os seguintes registros de comportamento e forneça insights úteis.
@@ -61,30 +59,24 @@ class GeminiService(private val apiKey: String) {
                 Todos os textos devem estar em português. Seja específico e baseie suas análises apenas nos dados fornecidos.
             """.trimIndent()
 
-            // Enviar o prompt para o Gemini
             val response = model.generateContent(
                 content {
                     text(prompt)
                 }
             )
 
-            // Processar a resposta
             val responseText = response.text?.trim() ?: throw Exception("Resposta vazia do Gemini")
             
-            // Extrair o JSON da resposta (pode estar dentro de blocos de código)
             val jsonPattern = """\{[\s\S]*\}""".toRegex()
             val jsonMatch = jsonPattern.find(responseText)
             val jsonString = jsonMatch?.value ?: throw Exception("Formato de resposta inválido")
             
-            // Parsear o JSON usando JSONObject do Android
             val jsonObject = JSONObject(jsonString)
             
-            // Extrair arrays do JSON
             val patternsArray = jsonObject.optJSONArray("patterns") ?: JSONArray()
             val triggersArray = jsonObject.optJSONArray("triggers") ?: JSONArray()
             val recommendationsArray = jsonObject.optJSONArray("recommendations") ?: JSONArray()
             
-            // Converter JSONArrays para Lists
             val patterns = mutableListOf<String>()
             val triggers = mutableListOf<String>()
             val recommendations = mutableListOf<String>()

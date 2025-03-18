@@ -31,7 +31,6 @@ class DashboardViewModel(
     private fun loadRealData() {
         viewModelScope.launch {
             try {
-                // Obter todos os registros do banco de dados
                 behaviorRecordDao.getAllBehaviorRecords().collect { records ->
                     if (records.isNotEmpty()) {
                         updateDashboardWithRealData(records)
@@ -64,10 +63,8 @@ class DashboardViewModel(
     }
 
     private fun updateDashboardWithRealData(records: List<BehaviorRecord>) {
-        // Formatar datas para o gráfico de linha
         val dateFormatter = DateTimeFormatter.ofPattern("dd/MM")
         
-        // Agrupar registros por data e calcular intensidade média para cada dia
         val intensityByDate = records
             .groupBy { 
                 LocalDateTime.ofInstant(
@@ -81,16 +78,14 @@ class DashboardViewModel(
             .toList()
             .sortedBy { it.first }
             .map { Pair(it.first.format(dateFormatter), it.second) }
-            .takeLast(10) // Mostrar apenas os últimos 10 dias com dados
+            .takeLast(10) 
         
-        // Calcular distribuição de humor
         val moodDistribution = records
             .groupBy { it.mood ?: "Não especificado" }
             .mapValues { it.value.size }
             .filterKeys { it.isNotBlank() }
-            .toMap() // Converter para Map<String, Int> explicitamente
+            .toMap() 
         
-        // Calcular frequência por dia da semana
         val weekdayFrequency = records
             .groupBy { 
                 val date = LocalDateTime.ofInstant(
@@ -101,26 +96,21 @@ class DashboardViewModel(
             }
             .mapValues { it.value.size }
         
-        // Identificar padrões
         val identifiedPatterns = mutableListOf<String>()
         
-        // Padrão de humor predominante
         val predominantMood = moodDistribution.maxByOrNull { it.value }
         predominantMood?.let {
             identifiedPatterns.add("Humor predominante: ${it.key} (${it.value} ocorrências)")
         }
         
-        // Padrão de dia da semana com mais registros
         val busyDay = weekdayFrequency.maxByOrNull { it.value }
         busyDay?.let {
             identifiedPatterns.add("Dia com mais registros: ${it.key} (${it.value} registros)")
         }
         
-        // Padrão de intensidade média
         val avgIntensity = records.map { it.intensity.toFloat() }.average()
         identifiedPatterns.add("Intensidade média: %.1f".format(avgIntensity))
         
-        // Calcular tendência semanal
         val today = LocalDate.now()
         val lastWeekRecords = records.filter { 
             val recordDate = LocalDateTime.ofInstant(
@@ -145,20 +135,16 @@ class DashboardViewModel(
             0.0
         }
         
-        // Análise de gatilhos
         val triggerAnalysis = analyzeTriggers(records)
         
-        // Recomendações personalizadas baseadas nos dados
         val personalizedRecommendations = generatePersonalizedRecommendations(
             records, 
             triggerAnalysis, 
             avgIntensity.toFloat()
         )
         
-        // Sugestões de próximos passos
         val nextStepsSuggestions = generateNextStepsSuggestions(records.size)
         
-        // Atualizar o estado com os dados reais
         _state.update {
             DashboardState(
                 totalRecords = records.size,
@@ -176,7 +162,6 @@ class DashboardViewModel(
     }
     
     private fun analyzeTriggers(records: List<BehaviorRecord>): Map<String, Float> {
-        // Agrupar registros por gatilho e calcular a porcentagem
         val triggersWithHighIntensity = records
             .filter { it.intensity >= 4 && !it.trigger.isNullOrBlank() }
             .groupBy { it.trigger!! }
@@ -206,7 +191,6 @@ class DashboardViewModel(
     ): List<Recommendation> {
         val recommendations = mutableListOf<Recommendation>()
         
-        // Recomendação de respiração para todos
         recommendations.add(
             Recommendation(
                 title = "Técnica de Respiração",
@@ -214,7 +198,6 @@ class DashboardViewModel(
             )
         )
         
-        // Recomendação de rotina consistente
         recommendations.add(
             Recommendation(
                 title = "Rotina Consistente",
@@ -222,7 +205,6 @@ class DashboardViewModel(
             )
         )
         
-        // Recomendação baseada nos gatilhos
         if (triggerAnalysis.keys.any { it.contains("som", ignoreCase = true) || it.contains("barulho", ignoreCase = true) }) {
             recommendations.add(
                 Recommendation(
@@ -237,16 +219,9 @@ class DashboardViewModel(
     
     private fun generateNextStepsSuggestions(recordCount: Int): List<String> {
         val suggestions = mutableListOf<String>()
-        
-        // Sugestão básica para todos
         suggestions.add("Registre os comportamentos consistentemente para análises mais precisas")
-        
-        // Sugestão de estratégia de regulação emocional
         suggestions.add("Experimente uma nova estratégia de regulação emocional por semana")
-        
-        // Sugestão de compartilhar com terapeuta
         suggestions.add("Compartilhe estes insights com seu terapeuta na próxima sessão")
-        
         return suggestions
     }
 }

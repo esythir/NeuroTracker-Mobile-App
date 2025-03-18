@@ -34,13 +34,11 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun NeuroTrackTheme(
     userPreferencesManager: UserPreferencesManager = koinInject(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
     val userPreferences by userPreferencesManager.userPreferencesFlow.collectAsState(initial = null)
     
-    // Determinar se deve usar o tema escuro com base nas preferências do usuário
     val darkTheme = when {
         userPreferences?.useDarkTheme != null -> userPreferences?.useDarkTheme == true
         else -> isSystemInDarkTheme()

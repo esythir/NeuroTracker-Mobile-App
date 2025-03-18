@@ -20,7 +20,6 @@ class ConvertApiRepository {
     private val apiService = RetrofitClient.convertApiService
     private val TAG = "ConvertApiRepository"
     
-    // Chave secreta atualizada
     private val apiSecret = "secret_JMgdqX4Os3xG2lj7"
     
     suspend fun convertCsvToPdf(context: Context): Result<File> = withContext(Dispatchers.IO) {

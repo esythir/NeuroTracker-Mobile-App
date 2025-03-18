@@ -40,7 +40,6 @@ fun SettingsScreen(
     val userPreferencesManager = koinInject<UserPreferencesManager>()
     val userName by userPreferencesManager.userName.collectAsState(initial = "")
     
-    // Launcher para salvar o arquivo PDF
     val savePdfLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -79,7 +78,6 @@ fun SettingsScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Perfil
             SettingsSection(title = "") {
                 SettingsCard(
                     icon = Icons.Default.Person,
@@ -89,7 +87,6 @@ fun SettingsScreen(
                 )
             }
             
-            // Aparência
             SettingsSection(title = "Aparência") {
                 SettingsSwitchCard(
                     icon = Icons.Default.DarkMode,
@@ -100,7 +97,6 @@ fun SettingsScreen(
                 )
             }
             
-            // Notificações
             SettingsSection(title = "Notificações") {
                 SettingsSwitchCard(
                     icon = Icons.Default.Notifications,
@@ -111,7 +107,6 @@ fun SettingsScreen(
                 )
             }
             
-            // Dados
             SettingsSection(title = "Dados") {
                 SettingsCard(
                     icon = Icons.Default.CloudDownload,
@@ -128,7 +123,6 @@ fun SettingsScreen(
                 )
             }
             
-            // Sobre
             SettingsSection(title = "Sobre") {
                 SettingsCard(
                     icon = Icons.Default.Info,
@@ -140,7 +134,6 @@ fun SettingsScreen(
         }
     }
     
-    // Diálogos
     if (state.showShareDialog) {
         AlertDialog(
             onDismissRequest = { viewModel.dismissShareDialog() },
@@ -181,7 +174,6 @@ fun SettingsScreen(
         )
     }
     
-    // Diálogo sobre o app
     if (aboutDialogVisible) {
         AlertDialog(
             onDismissRequest = { aboutDialogVisible = false },
