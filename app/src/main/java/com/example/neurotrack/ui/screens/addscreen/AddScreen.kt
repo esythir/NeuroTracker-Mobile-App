@@ -122,7 +122,7 @@ fun AddScreen(
                     color = Color(0xFF333333)
                 )
                 Text(
-                    text = "Registre Novo Humor",
+                    text = "Novo Registro",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.weight(1f),
