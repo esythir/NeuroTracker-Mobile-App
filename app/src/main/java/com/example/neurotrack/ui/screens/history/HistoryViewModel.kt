@@ -1,16 +1,19 @@
 package com.example.neurotrack.ui.screens.history
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.neurotrack.data.local.dao.BehaviorRecordDao
+import com.example.neurotrack.data.local.entity.BehaviorRecordWithBehavior
 import com.example.neurotrack.ui.components.Record
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.collect
 
+@RequiresApi(Build.VERSION_CODES.O)
 class HistoryViewModel(
     private val behaviorRecordDao: BehaviorRecordDao
 ) : ViewModel() {
@@ -27,25 +30,28 @@ class HistoryViewModel(
         loadRecords()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun loadRecords() {
         viewModelScope.launch {
             try {
-                behaviorRecordDao.getAllBehaviorRecords()
-                    .collect { records ->
+                behaviorRecordDao.getAllBehaviorRecordsWithBehaviorName()
+                    .collect { recordsWithBehavior ->
+                        val mappedRecords = recordsWithBehavior.map { item ->
+                            val r = item.behaviorRecord
+                            Record(
+                                id = r.id.toLong(),
+                                title = item.behaviorName,
+                                description = r.notes ?: "Sem observações",
+                                timestamp = LocalDateTime.ofInstant(
+                                    Instant.ofEpochSecond(r.timestamp),
+                                    ZoneId.systemDefault()
+                                ),
+                                score = r.intensity
+                            )
+                        }
                         _state.update { currentState ->
                             currentState.copy(
-                                records = records.map { record ->
-                                    Record(
-                                        id = record.id.toLong(),
-                                        title = record.mood ?: "Sem humor registrado",
-                                        description = record.notes ?: "Sem observações",
-                                        timestamp = LocalDateTime.ofInstant(
-                                            Instant.ofEpochSecond(record.timestamp),
-                                            ZoneId.systemDefault()
-                                        ),
-                                        score = record.intensity
-                                    )
-                                },
+                                records = mappedRecords,
                                 isRefreshing = false
                             )
                         }
@@ -60,4 +66,4 @@ class HistoryViewModel(
 data class HistoryState(
     val records: List<Record> = emptyList(),
     val isRefreshing: Boolean = false
-) 
+)

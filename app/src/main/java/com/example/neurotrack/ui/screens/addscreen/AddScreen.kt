@@ -1,4 +1,5 @@
 package com.example.neurotrack.ui.screens.addscreen
+
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -31,6 +32,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AddScreen(
@@ -45,6 +47,7 @@ fun AddScreen(
     val selectedDate by viewModel.selectedDate.collectAsState()
     val showSuccessDialog by viewModel.showSuccessDialog.collectAsState()
     val isFromCalendarState by viewModel.isFromCalendarFlow.collectAsState()
+
     var showTimePicker by remember { mutableStateOf(false) }
     var selectedDateTime by remember {
         val now = LocalDateTime.now()
@@ -55,24 +58,26 @@ fun AddScreen(
     val userPreferencesManager = koinInject<UserPreferencesManager>()
     val userName by userPreferencesManager.userName.collectAsState(initial = "")
 
-
     var selectedMood by remember { mutableStateOf<String?>(null) }
     val selectedFeelings = remember { mutableStateListOf<UiFeeling>() }
     var selectedIntensity by remember { mutableStateOf<Int?>(null) }
+
+    // Agora passamos a gravar de fato o comportamento escolhido
     var selectedBehavior by remember { mutableStateOf("") }
+
     var selectedDuration by remember { mutableStateOf("") }
     var selectedTrigger by remember { mutableStateOf("") }
     var observations by remember { mutableStateOf("") }
 
+    // Opções que aparecem na tela
     val behaviorOptions = listOf("Seletividade Alimentar", "Crise Emocional", "Hiperatividade")
     val durationOptions = listOf("15 min", "30 min", "45 min", "1h", "1h30", "2h", "2h+")
     val triggerOptions = listOf("Sons altos", "Mudança brusca de rotina", "Fome", "Luz intensa", "Outro")
 
-
     val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.getDefault())
     var dateTimeValue by remember { mutableStateOf(dateFormat.format(Date())) }
 
-
+    // Lista de possíveis sentimentos
     val feelings = listOf(
         UiFeeling(1, "Feliz", Color(0xFF4CAF50)),
         UiFeeling(2, "Triste", Color(0xFF2196F3)),
@@ -94,7 +99,6 @@ fun AddScreen(
         UiFeeling(18, "Surpreso", Color(0xFFFFEB3B))
     )
 
-
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -107,6 +111,7 @@ fun AddScreen(
                 .padding(20.dp)
         ) {
 
+            // Topo com seta de voltar e titulo
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
@@ -135,7 +140,7 @@ fun AddScreen(
                 )
             }
 
-
+            // Humor
             Text(
                 "Como $userName está se sentindo?",
                 style = MaterialTheme.typography.titleMedium,
@@ -147,7 +152,6 @@ fun AddScreen(
                 color = Color(0xFF666666),
                 modifier = Modifier.padding(bottom = 16.dp)
             )
-
 
             val emojiColors = mapOf(
                 "Feliz" to Color(0xFF4CAF50),
@@ -171,7 +175,7 @@ fun AddScreen(
                 modifier = Modifier.padding(bottom = 25.dp)
             )
 
-
+            // Sentimentos
             Text(
                 "Sentimentos Envolvidos",
                 style = MaterialTheme.typography.titleMedium,
@@ -189,7 +193,7 @@ fun AddScreen(
             )
             Spacer(modifier = Modifier.height(35.dp))
 
-
+            // Comportamento
             Text(
                 "Selecione o comportamento do paciente",
                 style = MaterialTheme.typography.titleMedium,
@@ -210,7 +214,7 @@ fun AddScreen(
             )
             Spacer(modifier = Modifier.height(35.dp))
 
-
+            // Duração
             Text(
                 "Duração do comportamento do paciente",
                 style = MaterialTheme.typography.titleMedium,
@@ -231,14 +235,13 @@ fun AddScreen(
             )
             Spacer(modifier = Modifier.height(35.dp))
 
-
+            // Intensidade
             Text(
                 "Selecione a intensidade do comportamento do paciente",
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(bottom = 6.dp)
             )
             Spacer(modifier = Modifier.height(10.dp))
-
 
             val intensityColors = listOf(
                 Color(0xFF4CAF50),
@@ -276,7 +279,7 @@ fun AddScreen(
             }
             Spacer(modifier = Modifier.height(40.dp))
 
-
+            // Gatilho
             Text(
                 "O que desencadeou o comportamento?",
                 style = MaterialTheme.typography.titleMedium,
@@ -299,7 +302,7 @@ fun AddScreen(
             )
             Spacer(modifier = Modifier.height(35.dp))
 
-
+            // Data e hora
             Text(
                 "Data e Hora do Ocorrido",
                 style = MaterialTheme.typography.titleMedium,
@@ -326,6 +329,7 @@ fun AddScreen(
             }
             Spacer(modifier = Modifier.height(40.dp))
 
+            // Observações
             Text(
                 "Observações adicionais",
                 style = MaterialTheme.typography.titleMedium,
@@ -348,6 +352,7 @@ fun AddScreen(
             )
             Spacer(modifier = Modifier.height(25.dp))
 
+            // Dialog de sucesso
             if (showSuccessDialog) {
                 AlertDialog(
                     onDismissRequest = {
@@ -398,10 +403,20 @@ fun AddScreen(
                 )
             }
 
+            // Botão de salvar
             Button(
                 onClick = {
+                    // Mapeia cada comportamento para seu ID no banco
+                    val behaviorMap = mapOf(
+                        "Crise Emocional" to 1,
+                        "Seletividade Alimentar" to 2,
+                        "Hiperatividade" to 3
+                    )
+                    // Se não achar, volta para 1 (opcional)
+                    val chosenBehaviorId = behaviorMap[selectedBehavior] ?: 1
+
                     viewModel.saveBehaviorRecord(
-                        behaviorId = 1,
+                        behaviorId = chosenBehaviorId, // Agora usa o ID correto
                         mood = selectedMood,
                         feelings = selectedFeelings.map { it.name },
                         intensity = selectedIntensity ?: 1,
@@ -438,6 +453,7 @@ fun AddScreen(
         }
     }
 
+    // Alerta com seletor de hora
     if (showTimePicker) {
         AlertDialog(
             onDismissRequest = { showTimePicker = false },
@@ -446,7 +462,7 @@ fun AddScreen(
             text = {
                 Column {
                     if (!isFromCalendarState) {
-                        // TODO: Adicionar DatePicker, se desejado
+                        // Você pode adicionar um DatePicker aqui, se quiser
                     }
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -503,6 +519,7 @@ fun EmojiSelector(
         }
     }
 }
+
 @Composable
 fun EmojiButton(
     emoji: String,
@@ -534,8 +551,10 @@ fun EmojiButton(
     }
 }
 
-
+// Data class Feeling (opcional, pois você já usa UiFeeling)
 data class Feeling(val text: String, val color: Color)
+
+// Layout para FlowRow de chips (caso use)
 @Composable
 fun FlowRow(
     modifier: Modifier = Modifier,
@@ -568,6 +587,8 @@ fun FlowRow(
         }
     }
 }
+
+// Chip (caso esteja usando)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Chip(
@@ -586,6 +607,8 @@ fun Chip(
         }
     }
 }
+
+// Dropdown de múltipla seleção (sentimentos)
 @Composable
 fun MultiSelectDropdown(
     allOptions: List<UiFeeling>,
@@ -634,6 +657,8 @@ fun MultiSelectDropdown(
         }
     }
 }
+
+// Dropdown de seleção única (behavior, gatilho, etc.)
 @Composable
 fun SingleSelectDropdown(
     modifier: Modifier = Modifier,
@@ -644,6 +669,7 @@ fun SingleSelectDropdown(
 ) {
     var dropdownExpanded by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
+
     Column(modifier = modifier.fillMaxWidth()) {
         Box(
             modifier = Modifier
@@ -686,6 +712,8 @@ fun SingleSelectDropdown(
         }
     }
 }
+
+// NumberPicker para hora/minuto
 @Composable
 private fun NumberPicker(
     value: Int,
@@ -713,6 +741,7 @@ private fun NumberPicker(
         }
     }
 }
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview
 @Composable

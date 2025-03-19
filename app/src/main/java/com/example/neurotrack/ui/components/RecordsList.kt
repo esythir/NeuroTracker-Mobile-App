@@ -1,5 +1,7 @@
 package com.example.neurotrack.ui.components
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -31,6 +33,7 @@ data class Record(
     val score: Int
 )
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun RecordsList(
     records: List<Record>,
@@ -60,6 +63,7 @@ fun RecordsList(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun EnhancedRecordItem(
