@@ -2,6 +2,7 @@ package com.example.neurotrack.data.local.dao
 
 import androidx.room.*
 import com.example.neurotrack.data.local.entity.BehaviorRecord
+import com.example.neurotrack.data.local.entity.BehaviorRecordWithBehavior
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -36,4 +37,24 @@ interface BehaviorRecordDao {
 
     @Query("DELETE FROM behavior_records")
     suspend fun deleteAllBehaviorRecords()
-} 
+
+    @Query("""
+        SELECT br.*, b.name AS behaviorName
+        FROM behavior_records AS br
+        INNER JOIN behaviors AS b ON b.id = br.behaviorId
+        ORDER BY br.timestamp DESC
+    """)
+    fun getAllBehaviorRecordsWithBehaviorName(): Flow<List<BehaviorRecordWithBehavior>>
+
+    @Query("""
+        SELECT br.*, b.name AS behaviorName
+        FROM behavior_records AS br
+        INNER JOIN behaviors AS b ON b.id = br.behaviorId
+        WHERE br.timestamp >= :startTime AND br.timestamp < :endTime
+        ORDER BY br.timestamp DESC
+    """)
+    fun getBehaviorRecordsBetweenDatesWithBehaviorName(
+        startTime: Long,
+        endTime: Long
+    ): Flow<List<BehaviorRecordWithBehavior>>
+}

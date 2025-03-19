@@ -38,7 +38,7 @@ fun HomeStatsGrid(
             
             StatsCard(
                 icon = Icons.Default.Timeline,
-                label = "Média de Intensidade",
+                label = "Intensidade",
                 value = String.format("%.1f", averageScore),
                 onClick = { /* TODO */ },
                 modifier = Modifier.weight(1f)
