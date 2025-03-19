@@ -5,7 +5,6 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.neurotrack.data.local.dao.BehaviorRecordDao
-import com.example.neurotrack.data.local.entity.BehaviorRecordWithBehavior
 import com.example.neurotrack.ui.components.Record
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -46,7 +45,8 @@ class HistoryViewModel(
                                     Instant.ofEpochSecond(r.timestamp),
                                     ZoneId.systemDefault()
                                 ),
-                                score = r.intensity
+                                score = r.intensity,
+                                mood = r.mood
                             )
                         }
                         _state.update { currentState ->

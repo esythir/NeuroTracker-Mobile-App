@@ -48,7 +48,6 @@ class CalendarViewModel(
                 val startOfDay = date.atStartOfDay().toInstant(ZoneOffset.UTC).epochSecond
                 val endOfDay = date.atTime(23, 59, 59).toInstant(ZoneOffset.UTC).epochSecond
 
-                // Agora usamos a versão com nome do Behavior:
                 behaviorRecordDao.getBehaviorRecordsBetweenDatesWithBehaviorName(startOfDay, endOfDay)
                     .collect { recordsWithBehavior ->
                         val mappedRecords = recordsWithBehavior.map { item ->
@@ -61,7 +60,8 @@ class CalendarViewModel(
                                     Instant.ofEpochSecond(r.timestamp),
                                     ZoneId.systemDefault()
                                 ),
-                                score = r.intensity
+                                score = r.intensity,
+                                mood = r.mood
                             )
                         }
                         _state.update { it.copy(records = mappedRecords, isLoading = false) }

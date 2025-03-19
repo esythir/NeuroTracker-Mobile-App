@@ -19,18 +19,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.example.neurotrack.ui.theme.*
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 data class Record(
     val id: Long,
     val title: String,
     val description: String,
     val timestamp: LocalDateTime,
-    val score: Int
+    val score: Int,
+    val mood: String? = null
 )
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -72,7 +73,7 @@ private fun EnhancedRecordItem(
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
-    
+
     val moodColor = when (record.score) {
         1 -> MoodExcellent
         2 -> MoodGood
@@ -81,7 +82,7 @@ private fun EnhancedRecordItem(
         5 -> MoodTerrible
         else -> MaterialTheme.colorScheme.primary
     }
-    
+
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -120,9 +121,9 @@ private fun EnhancedRecordItem(
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.width(12.dp))
-                
+
                 Column(
                     modifier = Modifier.weight(1f)
                 ) {
@@ -131,33 +132,37 @@ private fun EnhancedRecordItem(
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
-                    
+
                     Spacer(modifier = Modifier.height(4.dp))
-                    
+
+                    val dateText = record.timestamp.format(
+                        DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+                    )
+                    val moodText = record.mood ?: "" // se for nulo, deixa vazio
+
                     Text(
-                        text = record.timestamp.format(
-                            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
-                        ),
+                        // "10/02/2024 12:37 - Bem"
+                        text = "$dateText - $moodText",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )
                 }
-                
+
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowRight,
                     contentDescription = "Ver detalhes",
                     tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
                 )
             }
-            
+
             if (record.description.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 Divider(
                     modifier = Modifier.padding(vertical = 8.dp),
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
                 )
-                
+
                 Text(
                     text = record.description,
                     style = MaterialTheme.typography.bodyMedium,
@@ -166,7 +171,7 @@ private fun EnhancedRecordItem(
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(top = 4.dp)
                 )
-                
+
                 if (record.description.length > 100) {
                     TextButton(
                         onClick = { expanded = !expanded },
@@ -201,9 +206,9 @@ private fun EmptyRecordsMessage(
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
             )
-            
+
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             Text(
                 text = "Adicione novos registros para visualizá-los aqui",
                 style = MaterialTheme.typography.bodyMedium,
@@ -211,4 +216,4 @@ private fun EmptyRecordsMessage(
             )
         }
     }
-} 
+}

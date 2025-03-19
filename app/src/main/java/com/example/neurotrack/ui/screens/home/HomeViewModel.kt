@@ -73,7 +73,8 @@ class HomeViewModel(
                                     Instant.ofEpochSecond(r.timestamp),
                                     ZoneId.systemDefault()
                                 ),
-                                score = r.intensity
+                                score = r.intensity,
+                                mood = r.mood
                             )
                         }
 
